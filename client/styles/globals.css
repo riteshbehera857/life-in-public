@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@400;500;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --body-font: "DM Sans";
+  --secondary-font: "Poppins";
+
+  --accent-primary: #aa3eff;
+  --base-heading: #656565;
+  --base-text: #666666;
+
+  --padding-x-lg-mobile: 33px;
+  --padding-x-sm-mobile: 25px;
+
+  --padding-x-btn: 57px;
+  --padding-y-btn: 29px;
+
+  --primary-heading: 27px;
+  --text-body: 16px;
+
+  --xs-device: 360px;
+  --tablet: 768px;
+  --xs-laptop: 1300px;
+  --md-laptop: 1440px;
+  --lg-device: 1920px;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+body {
+  box-sizing: border-box;
+  font-family: "DM Sans";
+  font-weight: 400;
+}
+
+.bg-gradient {
+  background: linear-gradient(
+    to right bottom,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0.16)
+  );
+}
+
+.bg-gradient-x {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.bg-gradient-x-reverse {
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.bg-glass {
+  background-color: rgba(255, 255, 255, 0.17);
+  -webkit-backdrop-filter: blur(100px);
+  backdrop-filter: blur(100px);
+}

@@ -1,0 +1,19 @@
+{
+  "name": "life-in-public",
+  "version": "1.0.0",
+  "description": "This is a social media app where people can share their experiences",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riteshbehera857/life-in-public.git"
+  },
+  "author": "riteshk_behera",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/riteshbehera857/life-in-public/issues"
+  },
+  "homepage": "https://github.com/riteshbehera857/life-in-public#readme"
+}
