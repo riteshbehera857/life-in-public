@@ -16,10 +16,11 @@ export interface IPost {
   caption: string;
   likes: [Types.ObjectId];
   created_by: string;
-  comments: [
-    {
-      title: string;
-      created_by: Types.ObjectId;
-    }
-  ];
+  comments: [Types.ObjectId];
+}
+
+export interface IComment {
+  content?: string;
+  post: Types.ObjectId;
+  created_by?: Types.ObjectId;
 }

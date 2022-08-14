@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { config } from "dotenv";
 import authRoutes from "./src/routes/auth.routes";
@@ -18,6 +18,11 @@ app.use(express.static("public"));
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/post", postRoutes);
+
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
+  const err = new Error(`Can't find ${req.originalUrl} path on the server`);
+  next(err);
+});
 
 app.use(errorHandler);
 

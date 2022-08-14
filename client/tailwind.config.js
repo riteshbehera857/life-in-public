@@ -18,17 +18,23 @@ module.exports = {
       },
       fontSize: {
         "primary-heading": "var(--primary-heading)",
-        "text-body": "var(--text-body)"
+        "text-body": "var(--text-body)",
+        "btn-text": "var(--text-btn)"
       },
       fontFamily: {
         "body-font": ["var(--body-font)", "sans-serif"],
         "seconday-font": ["var(--secondary-font)", "sans-serif"]
       },
+      borderRadius: {
+        "rounded-body": "var( --border-radius)"
+      },
       padding: {
         "padding-x-lg-mobile": "var(--padding-x-lg-mobile)",
         "padding-x-sm-mobile": "var(padding-x-sm-mobile)",
         "padding-x-btn": "var(--padding-x-btn)",
-        "padding-y-btn": "var(--padding-y-btn)"
+        "padding-y-btn": "var(--padding-y-btn)",
+        "padding-x-input": "var(--input-padding-x)",
+        "padding-y-input": "var(--input-padding-y)"
       }
     },
   },

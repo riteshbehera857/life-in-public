@@ -1,5 +1,41 @@
 import { Request, Response, NextFunction } from "express";
+import { verifyToken } from "../helpers";
 import User from "../models/auth.model";
+
+export const getCurrentUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Get the token and check if it exists
+    let token;
+    let user;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (!token) {
+      res.status(401);
+      throw new Error("You are not logged in, Please login to get access");
+    }
+    // validate the token
+    const decoded = verifyToken(token);
+
+    //  find user on basis of the decoded token id
+    user = await User.findById(decoded.id);
+
+    res.status(200).json({
+      status: "success",
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const updateUserPosts = async (
   req: Request,

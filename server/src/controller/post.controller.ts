@@ -108,6 +108,33 @@ const updatePostLikes = async (
   }
 };
 
+const updatePostComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    if (!id) throw new Error("Please provide a valid postID");
+
+    const { userID } = req.body;
+    if (!userID) throw new Error("Please provide a valid userID");
+
+    await User.findByIdAndUpdate(id, {
+      $push: {
+        comment: userID,
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      error: false,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
@@ -121,4 +148,11 @@ const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { getPosts, getPost, createPost, updatePostLikes, deletePost };
+export {
+  getPosts,
+  getPost,
+  createPost,
+  updatePostLikes,
+  updatePostComment,
+  deletePost,
+};
