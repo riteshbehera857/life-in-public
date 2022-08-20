@@ -43,7 +43,7 @@ const Home: NextPage = () => {
           <p className="text-[1.5rem] text-[#bbbbbb]">26 Jan, 2022</p>
         </div>
       </div>
-      <div className="">
+      <div className="mb-32">
         <div className="flex items-center mb-[1rem]">
           <div className="mr-4">
             <Image src={avatar} height="" width="" alt="avatar" />

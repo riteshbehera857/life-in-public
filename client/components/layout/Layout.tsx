@@ -1,13 +1,5 @@
-import { Header, Navbar } from "../";
-
-const Layout = ({ children }) => {
-  return (
-    <div>
-      <Header />
-      {children}
-      <Navbar />
-    </div>
-  );
+const Layout = ({ children }: any) => {
+  return <div>{children}</div>;
 };
 
 export default Layout;

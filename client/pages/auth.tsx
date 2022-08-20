@@ -1,9 +1,11 @@
 import { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
+import { Layout } from "../components";
+import type { NextPageWithLayout } from "./_app";
 
-const Auth: NextPage = () => {
+const Auth: NextPageWithLayout = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<number>(0);
   const handleActiveTab = (index: number, href: string) => {
@@ -61,6 +63,10 @@ const Auth: NextPage = () => {
       </div>
     </div>
   );
+};
+
+Auth.getLayout = function PageLayout(page: ReactElement) {
+  return <>{page}</>;
 };
 
 export default Auth;

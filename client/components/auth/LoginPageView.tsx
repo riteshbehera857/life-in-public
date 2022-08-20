@@ -7,8 +7,10 @@ import { ILogin, ILoginResponse } from "./../../types";
 
 import { BtnLoder, Button } from "./../";
 import { Eye, EyeOff } from "../ui/icons";
+import { useRouter } from "next/router";
 
 const LoginPageView = () => {
+  const router = useRouter();
   const [loginData, setLoginData] = useState<ILogin>({
     email: "",
     password: "",
@@ -16,7 +18,7 @@ const LoginPageView = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null | undefined>(null);
   const [passwordType, setPasswordType] = useState(true);
-  const { setLoggedIn } = useStateContext();
+  const { setLoggedIn, setToken } = useStateContext();
 
   const handleInput = (e: React.BaseSyntheticEvent) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -36,11 +38,15 @@ const LoginPageView = () => {
       clear();
       setLoading(false);
       console.log("Error", data);
+      setTimeout(() => {
+        setError("");
+      }, 2000);
     } else {
       console.log("Success", data);
+      data.token && setToken(data?.token);
       setLoading(false);
-      data.token && localStorage.setItem("token", data?.token);
       setLoggedIn(true);
+      router.push("/");
     }
   };
 

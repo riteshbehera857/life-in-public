@@ -15,42 +15,44 @@ const StateContext = createContext<IContext | any>(false);
 
 export const AuthContext = ({ children }: any) => {
   const router = useRouter();
+
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<IUser | null>(null);
   const [userID, setUserID] = useState<string>("");
 
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${process.env.NEXT_PUBLIC_BACKEND_PORT}${process.env.NEXT_PUBLIC_CURRENT_USER_END_POINT}`;
-
-  let token: string | null;
-  const ISSERVER = typeof window === "undefined";
-
-  if (!ISSERVER) {
-    token = localStorage.getItem("token");
-  }
+  // const ISSERVER = typeof window === "undefined";
+  // if (!ISSERVER) {
+  //   setToken(localStorage.getItem("token"));
+  // }
 
   useEffect(() => {
-    async function redirect() {
+    function redirect() {
       if (!loggedIn) router.push("/auth");
-      router.push("/");
     }
     redirect();
   }, [loggedIn]);
 
   useEffect(() => {
-    async function getCurrentUser() {
-      const response = await axios.get(url, {
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${process.env.NEXT_PUBLIC_BACKEND_PORT}${process.env.NEXT_PUBLIC_CURRENT_USER_END_POINT}`;
+
+    axios
+      .get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
-      setUserID(response?.data?.user?._id);
-      setUser(response?.data?.user);
-    }
-    getCurrentUser();
+      })
+      .then((res) => {
+        setUserID(res?.data?.user?._id);
+        setUser(res?.data?.user);
+      })
+      .catch((err) => console.log(err));
   }, [token]);
 
   return (
-    <StateContext.Provider value={{ loggedIn, setLoggedIn, user, userID }}>
+    <StateContext.Provider
+      value={{ loggedIn, setLoggedIn, user, userID, token, setToken }}
+    >
       {children}
     </StateContext.Provider>
   );
