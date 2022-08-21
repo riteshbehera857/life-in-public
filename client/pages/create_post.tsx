@@ -4,12 +4,38 @@ import { Switch } from "@headlessui/react";
 import { ArrowLeft } from "../components/ui/icons";
 import type { NextPageWithLayout } from "./_app";
 import { BtnLoder } from "../components";
+import axios from "axios";
 
 const CreatePost: NextPageWithLayout = () => {
   const [uploadImage, setUploadImage] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<string | undefined | Blob>();
+  const [uploadedImage, setUploadedImage] = useState("");
   const myRef = useRef<null | undefined | HTMLElement>();
-  const handleRef = () => myRef.current.click();
+  // const handleRef = () => {
+  //   myRef.current.click();
+  // };
+  // const handleUpload = (e: any) => {
+  //   console.log(e.target.files[0]);
+  //   // axios
+  //   //   .post("http://localhost:8000/upload", e.target?.files[0]?.file)
+  //   //   .then((res) => console.log(res))
+  //   //   .catch((err) => console.log(err));
+  // };
+
+  const handleFileChange = async (e: any) => {
+    setSelectedFile(e.target.files[0]);
+    selectedFile && (await handleUpload());
+  };
+
+  const handleUpload = async () => {
+    setUploadedImage("");
+    const fd = new FormData();
+    fd.append("file", selectedFile);
+    const res = await axios.post("http://localhost:8000/upload", fd);
+    setUploadedImage(res?.data?.data?.file);
+    console.log(uploadedImage);
+  };
 
   return (
     <div className="px-6">
@@ -51,21 +77,33 @@ const CreatePost: NextPageWithLayout = () => {
           </Switch>
         </div>
       </Switch.Group>
+      {uploadedImage && (
+        <>
+          <img
+            src={`http://localhost:8000/uploads/post_cover/${uploadedImage}`}
+            alt="Cover"
+          />
+        </>
+      )}
       {uploadImage && (
         <>
-          <div
-            onClick={handleRef}
+          {/* <div
+            // onClick={handleRef}
             className="flex items-center justify-center outline-offset-0 outline-2 outline-dashed outline-accent-primary hover:bg-[#ab3eff1a] transition-opacity duration-150 rounded-rounded-body cursor-pointer mb-6"
-          >
-            <label
-              ref={myRef}
+          > */}
+          {/* <label
               className="text-btn-text cursor-pointer py-40"
               htmlFor="file"
             >
               Select Photo
-              <input type="file" name="file" id="file" hidden />
-            </label>
-          </div>
+            </label> */}
+          <input
+            type="file"
+            onChange={handleFileChange}
+            name="file"
+            id="file"
+          />
+          {/* </div> */}
           <div>
             <label htmlFor="caption" className="text-[18px] text-[#363636]">
               Caption for the post

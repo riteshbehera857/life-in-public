@@ -1,6 +1,6 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { AuthContext } from "../context/StateContext";
+import { AuthContextProvider } from "../context/AuthContext";
 import { Header, Layout, Navbar } from "../components";
 import { NextPage } from "next";
 import { ReactElement, ReactNode } from "react";
@@ -16,19 +16,19 @@ type AppPropsWithLayout = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   if (Component.getLayout) {
     return Component.getLayout(
-      <AuthContext>
+      <AuthContextProvider>
         <Component {...pageProps} />
-      </AuthContext>
+      </AuthContextProvider>
     );
   }
   return (
-    <AuthContext>
+    <AuthContextProvider>
       <Layout>
         <Header />
         <Navbar />
         <Component {...pageProps} />
       </Layout>
-    </AuthContext>
+    </AuthContextProvider>
   );
 }
 

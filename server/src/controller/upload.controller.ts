@@ -19,7 +19,7 @@ export const fileUpload = async (
       .jpeg({ quality: 90 })
       .toFile(`public/uploads/post_cover/${req.body.file}`);
 
-    await File.create({
+    const file = await File.create({
       file: req.file
         ? req.body.file
         : "https://unsplash.com/photos/JocU2pEsN9Q",
@@ -28,6 +28,7 @@ export const fileUpload = async (
     res.status(201).json({
       status: "success",
       error: false,
+      data: file,
     });
   } catch (err) {
     next(err);

@@ -1,9 +1,9 @@
 import axios from "axios";
 import Link from "next/link";
-import React, { SyntheticEvent, useState } from "react";
-import { useStateContext } from "../../context/StateContext";
+import React, { SyntheticEvent, useEffect, useState } from "react";
+import { useLogin } from "../../hooks/useLogin";
 
-import { ILogin, ILoginResponse } from "./../../types";
+import { ILogin } from "./../../types";
 
 import { BtnLoder, Button } from "./../";
 import { Eye, EyeOff } from "../ui/icons";
@@ -15,10 +15,11 @@ const LoginPageView = () => {
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null | undefined>(null);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState<string | null | undefined>(null);
   const [passwordType, setPasswordType] = useState(true);
-  const { setLoggedIn, setToken } = useStateContext();
+  // const { setLoggedIn, setToken } = useStateContext();
+  const { login, error, isLoading } = useLogin();
 
   const handleInput = (e: React.BaseSyntheticEvent) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -28,26 +29,13 @@ const LoginPageView = () => {
     setLoginData({ email: "", password: "" });
   };
 
+  useEffect(() => {
+    console.log(isLoading ? "Loading..." : "Not Loading...");
+  }, [isLoading]);
+
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${process.env.NEXT_PUBLIC_BACKEND_PORT}${process.env.NEXT_PUBLIC_BACKEND_LOGIN_END_POINT}`;
-    const { data } = await axios.post<ILoginResponse>(url, loginData);
-    if (data.error) {
-      setError(data?.message);
-      clear();
-      setLoading(false);
-      console.log("Error", data);
-      setTimeout(() => {
-        setError("");
-      }, 2000);
-    } else {
-      console.log("Success", data);
-      data.token && setToken(data?.token);
-      setLoading(false);
-      setLoggedIn(true);
-      router.push("/");
-    }
+    await login(loginData.email, loginData.password);
   };
 
   return (
@@ -89,14 +77,14 @@ const LoginPageView = () => {
               />
               <span
                 onClick={() => setPasswordType((prev) => !prev)}
-                className="absolute top-1/2 -translate-y-1/2 right-[2.2rem]"
+                className="absolute top-1/2 -translate-y-1/2 right-[2.2rem] cursor-pointer"
               >
                 {passwordType ? <Eye /> : <EyeOff />}
               </span>
             </div>
 
             <button className="w-full py-padding-y-btn text-center text-btn-text font-bold text-white bg-[#aa3eff] rounded-rounded-body mb-2">
-              {!loading ? "Sign In" : <BtnLoder />}
+              {isLoading ? <BtnLoder /> : "Sign In"}
             </button>
             <p className="font-bold text-text-body cursor-pointer text-center">
               Not a member?{" "}

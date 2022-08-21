@@ -5,6 +5,7 @@ import { useState, BaseSyntheticEvent, SyntheticEvent } from "react";
 import { BtnLoder } from "./../";
 import { ILogin, IRegisterResponse } from "./../../types";
 import { Eye, EyeOff } from "../ui/icons";
+import { useSignup } from "./../../hooks/useSignup";
 
 interface ISignup extends ILogin {
   firstname: string;
@@ -19,8 +20,9 @@ const SignupPageView = () => {
     email: "",
     password: "",
   });
-  const [error, setError] = useState<string | null | undefined>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { signup, error, isLoading } = useSignup();
+  // const [error, setError] = useState<string | null | undefined>(null);
+  // const [loading, setLoading] = useState<boolean>(false);
   const [passwordType, setPasswordType] = useState(true);
 
   const clear = () => {
@@ -39,18 +41,24 @@ const SignupPageView = () => {
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const END_POINT: any = process.env.NEXT_PUBLIC_BACKEND_SIGNUP_END_POINT;
-    const { data } = await axios.post<IRegisterResponse>(END_POINT, signupData);
-    console.log(data);
-    if (data?.error) {
-      setError(data?.message);
-      clear();
-      setLoading(false);
-      return;
-    } else {
-      router.push("/auth/login");
-    }
+    // setLoading(true);
+    // const END_POINT: any = process.env.NEXT_PUBLIC_BACKEND_SIGNUP_END_POINT;
+    // const { data } = await axios.post<IRegisterResponse>(END_POINT, signupData);
+    // console.log(data);
+    // if (data?.error) {
+    //   setError(data?.message);
+    //   clear();
+    //   setLoading(false);
+    //   return;
+    // } else {
+    //   router.push("/auth/login");
+    // }
+    await signup(
+      signupData.firstname,
+      signupData.lastname,
+      signupData.email,
+      signupData.password
+    );
   };
 
   return (
@@ -110,7 +118,7 @@ const SignupPageView = () => {
               />
               <span
                 onClick={() => setPasswordType((prev) => !prev)}
-                className="absolute top-1/2 -translate-y-1/2 right-[2.2rem]"
+                className="absolute top-1/2 -translate-y-1/2 right-[2.2rem] cursor-pointer"
               >
                 {passwordType ? <Eye /> : <EyeOff />}
               </span>
@@ -119,7 +127,7 @@ const SignupPageView = () => {
               type="submit"
               className="w-full py-padding-y-btn text-center text-btn-text font-bold text-white bg-[#aa3eff] rounded-rounded-body mb-2"
             >
-              {loading ? <BtnLoder /> : "Register"}
+              {isLoading ? <BtnLoder /> : "Register"}
             </button>
             <p className="font-bold text-text-body cursor-pointer text-center">
               Already a member?{" "}

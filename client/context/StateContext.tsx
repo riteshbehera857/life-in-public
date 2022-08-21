@@ -11,7 +11,7 @@ interface IContext {
   setLoggedIn: (value: boolean) => void;
 }
 
-const StateContext = createContext<IContext | any>(false);
+export const StateContext = createContext<IContext | any>(false);
 
 export const AuthContext = ({ children }: any) => {
   const router = useRouter();
