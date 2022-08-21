@@ -12,11 +12,12 @@ export interface IUser {
 }
 
 export interface IPost {
-  cover: string;
-  caption: string;
-  likes: [Types.ObjectId];
-  created_by: string;
-  comments: [Types.ObjectId];
+  file?: string;
+  caption?: string;
+  body?: string;
+  likes?: [Types.ObjectId];
+  created_by?: string;
+  comments?: [Types.ObjectId];
 }
 
 export interface IComment {

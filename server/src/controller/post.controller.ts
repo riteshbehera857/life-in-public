@@ -50,24 +50,13 @@ const getPost = async (req: Request, res: Response, next: NextFunction) => {
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { caption, likes } = req.body;
-    if (!req.file) return next();
-
-    req.body.cover = `life-in-public-${
-      req.file.originalname
-    }-${Date.now()}.jpeg`;
-
-    await sharp(req.file.buffer)
-      .toFormat("jpeg")
-      .jpeg({ quality: 90 })
-      .toFile(`public/uploads/post_cover/${req.body.cover}`);
+    const { caption, likes, body } = req.body;
 
     if (!req.body) throw new Error("Please fill all the required fields");
 
     await Post.create({
-      cover: req.file
-        ? req.body.cover
-        : "https://unsplash.com/photos/JocU2pEsN9Q",
+      file: req.body.file,
+      body,
       caption,
       likes,
     });

@@ -5,6 +5,7 @@ import { IComment } from "../../types";
 const commentSchema = new Schema<IComment>({
   content: {
     type: String,
+    required: true,
   },
   post: {
     type: "ObjectID",
