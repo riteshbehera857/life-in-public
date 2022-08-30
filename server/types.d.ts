@@ -5,6 +5,8 @@ export interface IUser {
   firstname: string;
   lastname: string;
   email: string;
+  avatar: string;
+  username: string;
   password: string;
   cover: string;
   posts: [Types.ObjectId];

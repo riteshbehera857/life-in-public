@@ -2,16 +2,13 @@ const LikeFill = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-5 w-5"
-      viewBox="0 0 20 20"
-      fill="#FF0000"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
       {...props}
     >
-      <path
-        fillRule="evenodd"
-        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-        clipRule="evenodd"
-      />
+      <path fill="none" d="M0 0h24v24H0z"></path>
+      <path d="M16.5 3C19.538 3 22 5.5 22 9c0 7-7.5 11-10 12.5C9.5 20 2 16 2 9c0-3.5 2.5-6 5.5-6C9.36 3 11 4 12 5c1-1 2.64-2 4.5-2z"></path>
     </svg>
   );
 };

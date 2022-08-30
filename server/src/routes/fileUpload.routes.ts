@@ -3,12 +3,12 @@ import multer from "multer";
 import { fileUpload } from "../controller/upload.controller";
 
 const router = express.Router();
-const multerStorage = multer.memoryStorage();
+// const multerStorage = multer.memoryStorage();
 
-const upload = multer({
-  storage: multerStorage,
-});
+// const upload = multer({
+//   storage: multerStorage,
+// });
 
-router.route("/").post(upload.single("file"), fileUpload);
+router.route("/").post(fileUpload);
 
 export default router;

@@ -1,9 +1,11 @@
 import type { NextPage } from "next";
 import Image from "next/image";
+import { Layout } from "../components";
+
 import { LikeFill, Like, Comment } from "../components/ui/icons";
 import avatar from "./../public/images/avatar.svg";
 
-const Home: NextPage = () => {
+const Home = () => {
   return (
     <div className="h-[90vh] px-6 pt-[2.5rem]">
       <div className="mb-10">
@@ -83,5 +85,6 @@ const Home: NextPage = () => {
     </div>
   );
 };
+Home.Layout = Layout;
 
 export default Home;

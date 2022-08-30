@@ -15,10 +15,8 @@ const LoginPageView = () => {
     email: "",
     password: "",
   });
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState<string | null | undefined>(null);
   const [passwordType, setPasswordType] = useState(true);
-  // const { setLoggedIn, setToken } = useStateContext();
+
   const { login, error, isLoading } = useLogin();
 
   const handleInput = (e: React.BaseSyntheticEvent) => {

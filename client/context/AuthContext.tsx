@@ -1,58 +1,59 @@
 import axios from "axios";
-import {
-  createContext,
-  ReactElement,
-  useEffect,
-  useReducer,
-  useState,
-} from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 import { useRouter } from "next/router";
-import { IUser } from "../types";
+import { useCookies } from "react-cookie";
 
 export const AuthContext = createContext<any>(null);
 
 export const authReducer = (state: any, action: any) => {
   switch (action.type) {
     case "LOGIN":
-      return { token: action.payload };
+      return { user: action.payload };
     case "LOGOUT":
-      return { token: null };
+      return { user: null };
     default:
       return state;
   }
 };
 export const AuthContextProvider = ({ children }: any) => {
   const GET_USER = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${process.env.NEXT_PUBLIC_BACKEND_PORT}${process.env.NEXT_PUBLIC_CURRENT_USER_END_POINT}`;
-
   const [state, dispatch] = useReducer(authReducer, {
-    token: null,
+    user: null,
   });
-  const router = useRouter();
-  const [user, setUser] = useState();
+  const [token, setToken] = useState();
+  console.log(
+    "🚀 ~ file: AuthContext.tsx ~ line 27 ~ AuthContextProvider ~ token",
+    token
+  );
+  console.log(
+    "🚀 ~ file: AuthContext.tsx ~ line 25 ~ AuthContextProvider ~ state",
+    state.user
+  );
 
   useEffect(() => {
-    const fetchUser = () => {
+    const token = localStorage.getItem("token")
+      ? localStorage.getItem("token")
+      : null;
+    setToken(token);
+  }, []);
+
+  useEffect(() => {
+    if (token) {
       axios
         .get(GET_USER, {
           headers: {
-            Authorization: `Bearer ${state?.token}`,
+            Authorization: `Bearer ${token}`,
           },
         })
         .then((res) => {
-          setUser(res?.data?.user);
+          dispatch({ type: "LOGIN", payload: res?.data?.user });
         })
         .catch((err) => console.log(err));
-    };
-    fetchUser();
-  }, [state?.token, GET_USER]);
-
-  useEffect(() => {
-    if (user) router.push("/");
-    if (!user) router.push("/auth/login");
-  }, [user]);
+    }
+  }, [token]);
 
   return (
-    <AuthContext.Provider value={{ ...state, dispatch, user }}>
+    <AuthContext.Provider value={{ ...state, dispatch }}>
       {children}
     </AuthContext.Provider>
   );

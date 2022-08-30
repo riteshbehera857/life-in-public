@@ -14,11 +14,16 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: [true, "Lastname is required"],
   },
+  username: { type: String, default: null },
   email: {
     type: String,
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, "Please provide a valid email"],
+  },
+  avatar: {
+    type: String,
+    default: null,
   },
   password: {
     type: String,

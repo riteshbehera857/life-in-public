@@ -71,11 +71,16 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
     // Assign a new token to the user
     const token = assignToken(user._id);
-    res.status(200).json({
-      status: "success",
-      error: false,
-      token,
-    });
+    res
+      .cookie("access_token", token, {
+        httpOnly: false,
+      })
+      .status(200)
+      .json({
+        status: "success",
+        error: false,
+        token,
+      });
   } catch (error) {
     next(error);
   }
