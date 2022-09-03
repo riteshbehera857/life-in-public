@@ -27,7 +27,6 @@ export const getCurrentUser = async (
 
     //  find user on basis of the decoded token id
     user = await User.findById(decoded.id);
-    console.log(user);
     res.status(200).json({
       status: "success",
       user,
