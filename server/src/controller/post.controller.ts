@@ -50,12 +50,12 @@ const getPost = async (req: Request, res: Response, next: NextFunction) => {
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { caption, likes, body } = req.body;
+    const { caption, likes, body, cover } = req.body;
 
     if (!req.body) throw new Error("Please fill all the required fields");
 
     await Post.create({
-      file: req.body.file,
+      cover,
       body,
       caption,
       likes,

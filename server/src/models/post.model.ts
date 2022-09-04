@@ -3,7 +3,7 @@ import { Schema, model, Types } from "mongoose";
 import { IPost } from "../../types";
 
 const postSchema = new Schema<IPost>({
-  file: {
+  cover: {
     type: String,
   },
   caption: {

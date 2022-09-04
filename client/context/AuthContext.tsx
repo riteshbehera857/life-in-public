@@ -21,20 +21,20 @@ export const AuthContextProvider = ({ children }: any) => {
     user: null,
   });
   const [token, setToken] = useState();
-  console.log(
-    "🚀 ~ file: AuthContext.tsx ~ line 27 ~ AuthContextProvider ~ token",
-    token
-  );
-  console.log(
-    "🚀 ~ file: AuthContext.tsx ~ line 25 ~ AuthContextProvider ~ state",
-    state.user
-  );
+  // console.log(
+  //   "🚀 ~ file: AuthContext.tsx ~ line 27 ~ AuthContextProvider ~ token",
+  //   token
+  // );
+  // console.log(
+  //   "🚀 ~ file: AuthContext.tsx ~ line 25 ~ AuthContextProvider ~ state",
+  //   state.user
+  // );
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
+    const access_token = localStorage.getItem("token")
       ? localStorage.getItem("token")
       : null;
-    setToken(token);
+    setToken(access_token);
   }, []);
 
   useEffect(() => {

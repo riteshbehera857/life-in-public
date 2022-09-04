@@ -14,7 +14,7 @@ export interface IUser {
 }
 
 export interface IPost {
-  file?: string;
+  cover?: string;
   caption?: string;
   body?: string;
   likes?: [Types.ObjectId];

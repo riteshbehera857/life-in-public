@@ -42,10 +42,13 @@ export const useLogin = () => {
           // if (!res?.data?.user?.avatar || !res?.data?.user?.username) {
           //   router.push(`/${res?.data?.user?._id}/assign_username_avatar`);
           // }
+          router.push("/");
+          setIsLoading(false);
         })
-        .catch((err) => console.log(err));
-      setIsLoading(false);
-      router.push("/");
+        .catch((err) => {
+          console.log(err);
+          setIsLoading(false);
+        });
     }
   };
   return { login, isLoading, error };

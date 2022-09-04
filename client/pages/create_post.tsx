@@ -7,51 +7,98 @@ import { BtnLoder } from "../components";
 import axios from "axios";
 import { Blob } from "buffer";
 import Image from "next/image";
+import GhostBtnLoader from "../components/ui/loaders/GhostBtnLoader";
 
 const CreatePost: NextPageWithLayout = () => {
   const [fileUploadEnabled, setFileUploadEnabled] = useState(false);
-  const [previewSource, setPreviewSource] = useState<any>("");
-  const [fileInputState, setFileInputState] = useState("");
+  const [previewSource, setPreviewSource] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<string | undefined | Blob>();
-  const [uploadedImage, setUploadedImage] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File>();
   const myRef = useRef<null | undefined | HTMLElement>();
+
+  const [caption, setCaption] = useState("");
+  const [body, setBody] = useState("");
+
   const handleRef = () => {
-    myRef.current.click();
+    myRef.current?.click();
   };
+
+  useEffect(() => {
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedFile);
+      reader.onloadend = () => {
+        setPreviewSource(reader?.result as string);
+      };
+    } else {
+      setPreviewSource("");
+    }
+  }, [selectedFile]);
 
   const handleFileChange = async (e: any) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-    previewFile(file);
-    await handleFileUpload();
+    setSelectedFile(e.target.files[0]);
   };
 
-  const previewFile = (file: any) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setPreviewSource(reader?.result);
-    };
+  const handlePostUpload = async () => {
+    await uploadPostHandler();
   };
 
-  const handleFileUpload = async () => {
-    if (!selectedFile) return;
-    await uploadImageHandler(previewSource);
-  };
-
-  const uploadImageHandler = async (base64EncodedImage: any) => {
-    try {
-      const res = await axios.post("http://localhost:8000/upload", {
-        file: base64EncodedImage,
-      });
-      console.log(res);
-    } catch (error) {
-      console.error(error);
+  const uploadPostHandler = async () => {
+    setLoading(true);
+    if (selectedFile) {
+      console.log("inside if block");
+      try {
+        setLoading(true);
+        axios
+          .post("http://localhost:8000/upload", {
+            file: previewSource,
+          })
+          .then((res) => {
+            if (res?.data?.error) {
+              return;
+            }
+            axios
+              .post("http://localhost:8000/post/create_post", {
+                cover: res?.data?.data?.secure_url,
+                caption: caption ? caption : null,
+              })
+              .then((res) => {
+                console.log(res);
+                setLoading(false);
+              })
+              .catch((err) => {
+                setLoading(false);
+                console.log(err);
+              });
+          })
+          .catch((err) => {
+            setLoading(false);
+            console.log(err);
+          });
+      } catch (error) {
+        setLoading(false);
+      }
+    } else {
+      console.log("inside else block");
+      axios
+        .post("http://localhost:8000/post/create_post", {
+          body,
+        })
+        .then((res) => {
+          console.log(res);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
     }
   };
 
-  const deletePreview = () => {};
+  const deletePreview = () => {
+    setPreviewSource("");
+    setSelectedFile(undefined);
+  };
 
   return (
     <div className="px-6">
@@ -68,9 +115,11 @@ const CreatePost: NextPageWithLayout = () => {
           </label>
           <textarea
             name=""
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
             placeholder="Tell everyone about your day.."
             id="textarea"
-            rows="8"
+            rows={8}
             className="border-2 p-4 text-[1.5rem] mt-2 focus:ring-2 focus:ring-accent-primary focus:outline-none border-slate-200 w-full rounded-[8px]"
           />
         </div>
@@ -102,16 +151,16 @@ const CreatePost: NextPageWithLayout = () => {
               </div>
             ) : (
               <label
-                ref={myRef}
                 className="text-btn-text pointer-events-none cursor-pointer py-40"
                 htmlFor="file"
               >
                 Select Photo
                 <input
+                  ref={myRef}
                   type="file"
                   onChange={handleFileChange}
-                  value={fileInputState}
                   name="file"
+                  accept="image/*"
                   id="file"
                   hidden
                 />
@@ -126,6 +175,8 @@ const CreatePost: NextPageWithLayout = () => {
               id="caption"
               type="text"
               name="caption"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
               className="py-padding-y-input w-full border-2  mt-2 border-accent-primary rounded-rounded-body mb-[12px] text-text-body font-bold px-padding-x-input text-[#000] placeholder:text-[#9d9d9d] focus:outline-[#aa3eff]"
               placeholder="Caption"
             />
@@ -151,17 +202,14 @@ const CreatePost: NextPageWithLayout = () => {
         </div>
       </Switch.Group>
       <button
+        onClick={handlePostUpload}
         className="w-full py-padding-y-btn mt-10 text-center text-btn-text font-bold text-accent-primary border-2 hover:bg-[#ab3eff1a] transition-opacity duration-150
        border-accent-primary rounded-rounded-body mb-2"
       >
-        {!loading ? "Post" : <BtnLoder />}
+        {!loading ? "Post" : <GhostBtnLoader />}
       </button>
     </div>
   );
-};
-
-CreatePost.getLayout = function PageLayout(page: ReactElement) {
-  return <>{page}</>;
 };
 
 export default CreatePost;

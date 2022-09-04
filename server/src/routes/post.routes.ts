@@ -1,5 +1,4 @@
 import express from "express";
-import multer from "multer";
 import protectRoute from "../middlewares/auth.handler";
 import {
   createPost,
@@ -12,15 +11,9 @@ import {
 
 const router = express.Router();
 
-const multerStorage = multer.memoryStorage();
-
-const upload = multer({
-  storage: multerStorage,
-});
-
 router.route("/").get(getPosts);
 router.route("/:id").get(getPost).delete(deletePost);
-router.route("/create_post").post(upload.single("cover"), createPost);
+router.route("/create_post").post(createPost);
 router.route("/update-post-likes/:id").patch(updatePostLikes);
 router.route("/update-post-comment/:id").patch(updatePostComment);
 
