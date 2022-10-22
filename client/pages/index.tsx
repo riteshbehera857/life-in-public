@@ -1,87 +1,83 @@
-import type { NextPage } from "next";
-import Image from "next/image";
-import { Layout } from "../components";
+import axios from "axios";
+import useSwr, { useSWRConfig } from "swr";
+import Link from "next/link";
+import moment from "moment";
 
+import { Layout } from "../components";
+import { PostCard } from "./../components";
 import { LikeFill, Like, Comment } from "../components/ui/icons";
-import avatar from "./../public/images/avatar.svg";
+
+import { useAuthContext } from "../hooks/useAuthContext";
+import { GET_POST, LIKE } from "../constants";
 
 const Home = () => {
+  const { mutate } = useSWRConfig();
+  const { user } = useAuthContext();
+
+  const fetchPosts = async () => {
+    return await axios.get(GET_POST);
+  };
+  const { data, error } = useSwr(GET_POST, fetchPosts);
+
+  const handleLike = async (id) => {
+    await axios.patch(`${LIKE}/${id}`, {
+      userID: user._id,
+    });
+    mutate(GET_POST);
+  };
+
   return (
-    <div className="h-[90vh] px-6 pt-[2.5rem]">
-      <div className="mb-10">
-        <div className="flex items-center mb-[1rem]">
-          <div className="mr-4">
-            <Image src={avatar} height="" width="" alt="avatar" />
+    <div className="px-6 pt-[2.5rem]">
+      {data?.data?.data?.posts
+        ?.sort((a: any, b: any) => {
+          return (
+            new Date(b.created_at).valueOf() - new Date(a.created_at).valueOf()
+          );
+        })
+        .map((post) => (
+          <div key={post?._id} className="mb-10 last:mb-32">
+            <PostCard post={post} />
+            <div className="flex items-center gap-[1rem] mb-[1rem]">
+              {user?.likedPosts.includes(post._id) ? (
+                <LikeFill
+                  onClick={() => handleLike(post._id)}
+                  className="cursor-pointer h-12 w-12"
+                />
+              ) : (
+                <Like
+                  onClick={() => handleLike(post._id)}
+                  className="cursor-pointer h-12 w-12"
+                />
+              )}
+              <Link href={`/post/comments/${post._id}`}>
+                <Comment className="cursor-pointer h-12 w-12" />
+              </Link>
+            </div>
+            <div className="">
+              <p className="font-bold text-[1.5rem]">
+                {post?.likes.length} likes
+              </p>
+            </div>
+            <div className="mb-[1rem]">
+              <p className="font-bold text-[1.5rem]">
+                {post?.created_by?.firstname}{" "}
+                <span className="font-normal">{post?.caption}</span>
+              </p>
+            </div>
+            <div>
+              <Link href={`/post/comments/${post._id}`}>
+                <p className="text-[1.5rem] cursor-pointer hover:text-[#6b6b6b] transition-colors text-[#bbbbbb]">
+                  View all comments
+                </p>
+              </Link>
+            </div>
+            <div className="">
+              <p className="text-[1.5rem] text-[#bbbbbb]">
+                {moment(post?.created_at).format("DD MMM, YYYY")}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-medium text-[1.5rem]">Ritesh Kumar Behera</h3>
-          </div>
-        </div>
-        <div className="p-[2rem] mb-[1.5rem] border border-[#E2E8F0] rounded-[8px]">
-          <p className="text-[1.5rem]">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam
-            tempora beatae aliquid odio, qui quos temporibus, dolor tempore, cum
-            laudantium non nam modi! Repudiandae incidunt, modi quod nihil eum
-            quibusdam? Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
-        </div>
-        <div className="flex items-center gap-[1rem] mb-[1rem]">
-          <Like className="cursor-pointer h-12 w-12" />
-          <Comment className="cursor-pointer h-12 w-12" />
-        </div>
-        <div className="">
-          <p className="font-bold text-[1.5rem]">2000 likes</p>
-        </div>
-        <div className="mb-[1rem]">
-          <p className="font-bold text-[1.5rem]">
-            riteshbehera857{" "}
-            <span className="font-normal">Good Food Good Mood</span>
-          </p>
-        </div>
-        <div>
-          <p className="text-[1.5rem] text-[#bbbbbb]">View all comments</p>
-        </div>
-        <div>
-          <p className="text-[1.5rem] text-[#bbbbbb]">26 Jan, 2022</p>
-        </div>
-      </div>
-      <div className="mb-32">
-        <div className="flex items-center mb-[1rem]">
-          <div className="mr-4">
-            <Image src={avatar} height="" width="" alt="avatar" />
-          </div>
-          <div>
-            <h3 className="font-medium text-[1.5rem]">Ritesh Kumar Behera</h3>
-          </div>
-        </div>
-        <div className="p-[2rem] mb-[1.5rem] border border-[#E2E8F0] rounded-[8px]">
-          <p className="text-[1.5rem]">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam
-            tempora beatae aliquid odio, qui quos temporibus, dolor tempore, cum
-            laudantium non nam modi! Repudiandae incidunt, modi quod nihil eum
-            quibusdam? Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
-        </div>
-        <div className="flex items-center gap-[1rem] mb-[1rem]">
-          <Like className="cursor-pointer h-12 w-12" />
-          <Comment className="cursor-pointer h-12 w-12" />
-        </div>
-        <div className="">
-          <p className="font-bold text-[1.5rem]">2000 likes</p>
-        </div>
-        <div className="mb-[1rem]">
-          <p className="font-bold text-[1.5rem]">
-            riteshbehera857{" "}
-            <span className="font-normal">Good Food Good Mood</span>
-          </p>
-        </div>
-        <div>
-          <p className="text-[1.5rem] text-[#bbbbbb]">View all comments</p>
-        </div>
-        <div>
-          <p className="text-[1.5rem] text-[#bbbbbb]">26 Jan, 2022</p>
-        </div>
-      </div>
+        ))}
     </div>
   );
 };

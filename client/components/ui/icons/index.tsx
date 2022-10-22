@@ -13,3 +13,4 @@ export { default as BellFill } from "./BellFill";
 export { default as ArrowLeft } from "./ArrowLeft";
 export { default as Delete } from "./Delete";
 export { default as Logout } from "./Logout";
+export { default as Send } from "./Send";

@@ -49,7 +49,7 @@ html::after {
 }
 
 body {
-  height: 100vh;
+  /* height: 100vh; */
   box-sizing: border-box;
   font-family: "DM Sans";
   font-weight: 400;

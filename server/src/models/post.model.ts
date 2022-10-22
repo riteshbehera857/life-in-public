@@ -18,6 +18,22 @@ const postSchema = new Schema<IPost>({
       ref: "User",
     },
   ],
+  comments: [
+    {
+      type: Types.ObjectId,
+      ref: "Comment",
+    },
+  ],
+  created_by: {
+    type: "ObjectId",
+    ref: "User",
+    required: true,
+  },
+  created_at: {
+    type: "Date",
+    required: true,
+    default: Date.now(),
+  },
   //   comments: [
   //     {
   //       type: String,
@@ -29,10 +45,10 @@ const postSchema = new Schema<IPost>({
   //   ],
 });
 
-postSchema.pre("/^find/", function (next: NextFunction) {
-  this.populate("likes");
-  next();
-});
+// postSchema.pre("/^find/", function (next: NextFunction) {
+//   this.populate("likes");
+//   next();
+// });
 
 const Post = model("Post", postSchema);
 export default Post;

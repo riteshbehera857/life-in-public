@@ -1,7 +1,8 @@
-import axios from "./../axios.config";
+import axios from "axios";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { IRegisterResponse, IUser } from "../types";
+import { SIGNUP } from "../constants";
+import { IRegisterResponse } from "../types";
 
 export const useSignup = () => {
   const [error, setError] = useState<null | string | undefined>(null);
@@ -17,8 +18,7 @@ export const useSignup = () => {
     setIsLoading(true);
     setError(null);
 
-    const END_POINT: any = process.env.NEXT_PUBLIC_BACKEND_SIGNUP_END_POINT;
-    const { data } = await axios.post<IRegisterResponse>(END_POINT, {
+    const { data } = await axios.post<IRegisterResponse>(SIGNUP, {
       firstname,
       lastname,
       email,

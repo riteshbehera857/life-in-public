@@ -8,24 +8,17 @@ export const getCurrentUser = async (
   next: NextFunction
 ) => {
   try {
-    // Get the token and check if it exists
-    let token;
+    const cookie = req.headers.cookie;
+    const token = cookie.split("=")[1];
     let user;
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    }
 
     if (!token) {
       res.status(401);
       throw new Error("You are not logged in, Please login to get access");
     }
-    // validate the token
+
     const decoded = verifyToken(token);
 
-    //  find user on basis of the decoded token id
     user = await User.findById(decoded.id);
     res.status(200).json({
       status: "success",

@@ -1,23 +1,29 @@
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+
+import { useAuthContext } from "../../hooks/useAuthContext";
 import { useLogin } from "../../hooks/useLogin";
 
 import { ILogin } from "./../../types";
-
-import { BtnLoder, Button } from "./../";
+import { BtnLoder } from "./../";
 import { Eye, EyeOff } from "../ui/icons";
-import { useRouter } from "next/router";
+import { GET_USER } from "../../constants";
+
+axios.defaults.withCredentials = true;
 
 const LoginPageView = () => {
   const router = useRouter();
+  const { dispatch } = useAuthContext();
+
   const [loginData, setLoginData] = useState<ILogin>({
     email: "",
     password: "",
   });
   const [passwordType, setPasswordType] = useState(true);
 
-  const { login, error, isLoading } = useLogin();
+  const { login, error, isLoading, setIsLoading, setError } = useLogin();
 
   const handleInput = (e: React.BaseSyntheticEvent) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -33,7 +39,26 @@ const LoginPageView = () => {
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-    await login(loginData.email, loginData.password);
+    const data = await login(loginData.email, loginData.password);
+    console.log({ data });
+    if (!data?.error) {
+      console.log("Hello");
+      axios
+        .get(GET_USER, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          console.log(res);
+          dispatch({ type: "LOGIN", payload: res?.data?.user });
+          router.push("/");
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setError(err);
+          setIsLoading(false);
+          clear();
+        });
+    }
   };
 
   return (

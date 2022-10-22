@@ -1,4 +1,3 @@
-import axios from "../../axios.config";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, BaseSyntheticEvent, SyntheticEvent } from "react";
@@ -41,18 +40,6 @@ const SignupPageView = () => {
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-    // setLoading(true);
-    // const END_POINT: any = process.env.NEXT_PUBLIC_BACKEND_SIGNUP_END_POINT;
-    // const { data } = await axios.post<IRegisterResponse>(END_POINT, signupData);
-    // console.log(data);
-    // if (data?.error) {
-    //   setError(data?.message);
-    //   clear();
-    //   setLoading(false);
-    //   return;
-    // } else {
-    //   router.push("/auth/login");
-    // }
     await signup(
       signupData.firstname,
       signupData.lastname,

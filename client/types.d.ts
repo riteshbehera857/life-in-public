@@ -32,3 +32,13 @@ export interface IUser {
   likedPosts: [];
   posts: [];
 }
+
+export interface PostResponse {
+  data: Post;
+  error: boolean;
+  status: string;
+}
+
+export interface Post {
+  posts: any[];
+}

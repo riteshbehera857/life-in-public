@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Comment from "../models/comment.model";
+import Post from "../models/post.model";
 
 const createComment = async (
   req: Request,
@@ -12,6 +13,13 @@ const createComment = async (
       throw new Error("Please provide all the required fields");
 
     const comment = await Comment.create({ content, created_by, post });
+
+    await Post.findByIdAndUpdate(post, {
+      $push: {
+        comments: comment._id,
+      },
+    });
+
     res.status(201).json({
       message: "success",
       error: false,

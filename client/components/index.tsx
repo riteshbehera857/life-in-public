@@ -5,3 +5,4 @@ export { default as Input } from "./ui/input/Input";
 export { default as Layout } from "./layout/Layout";
 export { default as Header } from "./ui/header/Header";
 export { default as Navbar } from "./ui/navbar/Navbar";
+export { default as PostCard } from "./posts/PostCard";

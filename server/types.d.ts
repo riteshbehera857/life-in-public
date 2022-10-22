@@ -10,7 +10,7 @@ export interface IUser {
   password: string;
   cover: string;
   posts: [Types.ObjectId];
-  likedPosts: [Types.ObjectId];
+  likedPosts: any[];
 }
 
 export interface IPost {
@@ -18,8 +18,11 @@ export interface IPost {
   caption?: string;
   body?: string;
   likes?: [Types.ObjectId];
-  created_by?: string;
+  created_by?: {
+    type: Types.ObjectId;
+  };
   comments?: [Types.ObjectId];
+  created_at?: Date;
 }
 
 export interface IComment {

@@ -1,11 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import sharp from "sharp";
+import { cloudinary } from "../../cloudinary";
 import User from "../models/auth.model";
 import Post from "../models/post.model";
+import File from "../models/files.model";
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const posts = await Post.find();
+    const posts = await Post.find()
+      .populate("created_by")
+      .populate("likes")
+      .sort({ created_at: 1 });
     res.status(200).json({
       status: "success",
       error: false,
@@ -21,21 +25,17 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
 const getPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const post = await Post.findById(id).populate({
-      path: "likes",
-      populate: [
-        {
-          path: "posts",
-          select: "-likes",
-          model: "Post",
+    const post = await Post.findById(id)
+      .populate("likes")
+      .populate("created_by")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "created_by",
+          model: "User",
         },
-        {
-          path: "likedPosts",
-          select: "-likes",
-          model: "Post",
-        },
-      ],
-    });
+      });
+
     res.status(200).json({
       status: "success",
       error: false,
@@ -50,15 +50,27 @@ const getPost = async (req: Request, res: Response, next: NextFunction) => {
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { caption, likes, body, cover } = req.body;
-
+    const { caption, likes, body, created_by } = req.body;
+    let uploadedFile;
+    if (req.body.file) {
+      const uploadedResponse = await cloudinary.uploader.upload(req.body.file);
+      await File.create({ file: uploadedResponse?.secure_url });
+      uploadedFile = uploadedResponse?.secure_url;
+    }
     if (!req.body) throw new Error("Please fill all the required fields");
 
-    await Post.create({
-      cover,
+    const post = await Post.create({
+      cover: uploadedFile ? uploadedFile : null,
       body,
       caption,
       likes,
+      created_by,
+    });
+
+    await User.findByIdAndUpdate(post.created_by, {
+      $push: {
+        posts: post._id,
+      },
     });
 
     res.status(201).json({
@@ -82,43 +94,45 @@ const updatePostLikes = async (
     const { userID } = req.body;
     if (!userID) throw new Error("Please provide a valid userID");
 
-    await User.findByIdAndUpdate(id, {
-      $push: {
-        likes: userID,
-      },
-    });
+    const post = await Post.findOne({ _id: id });
 
-    res.status(200).json({
-      status: "success",
-      error: false,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+    if (post?.likes?.includes(userID)) {
+      try {
+        await Post.findByIdAndUpdate(
+          id,
+          {
+            $pull: {
+              likes: userID,
+            },
+          },
+          { multi: true }
+        );
 
-const updatePostComment = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    if (!id) throw new Error("Please provide a valid postID");
+        return res.status(200).json({
+          status: "success",
+          error: false,
+        });
+      } catch (error) {
+        next(error);
+      }
+    } else {
+      await Post.findByIdAndUpdate(id, {
+        $push: {
+          likes: userID,
+        },
+      });
 
-    const { userID } = req.body;
-    if (!userID) throw new Error("Please provide a valid userID");
+      await User.findByIdAndUpdate(userID, {
+        $push: {
+          likedPosts: id,
+        },
+      });
 
-    await User.findByIdAndUpdate(id, {
-      $push: {
-        comment: userID,
-      },
-    });
-
-    res.status(200).json({
-      status: "success",
-      error: false,
-    });
+      res.status(200).json({
+        status: "success",
+        error: false,
+      });
+    }
   } catch (error) {
     next(error);
   }
@@ -137,11 +151,4 @@ const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export {
-  getPosts,
-  getPost,
-  createPost,
-  updatePostLikes,
-  updatePostComment,
-  deletePost,
-};
+export { getPosts, getPost, createPost, updatePostLikes, deletePost };

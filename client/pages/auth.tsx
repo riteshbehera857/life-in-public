@@ -1,11 +1,8 @@
-import { NextPage } from "next";
-import Image from "next/image";
+import Image from "next/future/image";
 import { useRouter } from "next/router";
-import { ReactElement, useState } from "react";
-import { Layout } from "../components";
-import type { NextPageWithLayout } from "./_app";
+import { useState } from "react";
 
-const Auth: NextPageWithLayout = () => {
+const Auth = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<number>(0);
   const handleActiveTab = (index: number, href: string) => {
@@ -19,7 +16,6 @@ const Auth: NextPageWithLayout = () => {
           src="/images/Auth_img.svg"
           width={408}
           height={416}
-          layout="responsive"
           alt="Auth screen image"
         />
       </div>
@@ -63,10 +59,6 @@ const Auth: NextPageWithLayout = () => {
       </div>
     </div>
   );
-};
-
-Auth.getLayout = function PageLayout(page: ReactElement) {
-  return <>{page}</>;
 };
 
 export default Auth;

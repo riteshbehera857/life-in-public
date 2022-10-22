@@ -14,7 +14,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
         message: "Please fill all the required fields",
       });
     }
-    // Check if a user already exists with this email address, if True then throw error
+
     const user = await User.findOne({ email });
     if (user) {
       res.json({
@@ -24,7 +24,6 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    // If user doesn't exists then create a new user
     const newUser: HydratedDocument<IUser> = await User.create({
       firstname,
       lastname,
@@ -48,7 +47,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
-    // Check if body contains the email and password
+
     if (!email || !password) {
       res.json({
         status: "failed",
@@ -57,10 +56,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    // Find the user with the email
     const user = await User.findOne({ email });
 
-    // Check if the user exists and compare the input password with the user password
     if (!user || !(await compareHash(password, user.password))) {
       res.json({
         status: "failed",
@@ -69,8 +66,15 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    // Assign a new token to the user
     const token = assignToken(user._id);
+
+    res.cookie("JWT", token, {
+      path: "/",
+      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+      sameSite: "lax",
+    });
+
     res.status(200).json({
       status: "success",
       error: false,

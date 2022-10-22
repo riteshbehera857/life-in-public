@@ -1,23 +1,28 @@
 import Link from "next/link";
-import React, { ReactElement, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Switch } from "@headlessui/react";
 import { ArrowLeft, Delete } from "../components/ui/icons";
-import type { NextPageWithLayout } from "./_app";
-import { BtnLoder } from "../components";
-import axios from "axios";
-import { Blob } from "buffer";
-import Image from "next/image";
-import GhostBtnLoader from "../components/ui/loaders/GhostBtnLoader";
 
-const CreatePost: NextPageWithLayout = () => {
+import axios from "axios";
+import Image from "next/future/image";
+import GhostBtnLoader from "../components/ui/loaders/GhostBtnLoader";
+import { useAuthContext } from "../hooks/useAuthContext";
+import { useCreatePost } from "../hooks/useCreatePost";
+
+const CreatePost = () => {
   const [fileUploadEnabled, setFileUploadEnabled] = useState(false);
   const [previewSource, setPreviewSource] = useState<string>("");
-  const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File>();
-  const myRef = useRef<null | undefined | HTMLElement>();
+  const myRef = useRef<null | undefined | HTMLInputElement>();
 
   const [caption, setCaption] = useState("");
   const [body, setBody] = useState("");
+
+  const { user } = useAuthContext();
+
+  const { createPost, isLoading, error, progress, isSuccess } = useCreatePost();
+  console.log("Progress", progress);
+  console.log(isSuccess);
 
   const handleRef = () => {
     myRef.current?.click();
@@ -44,55 +49,14 @@ const CreatePost: NextPageWithLayout = () => {
   };
 
   const uploadPostHandler = async () => {
-    setLoading(true);
-    if (selectedFile) {
-      console.log("inside if block");
-      try {
-        setLoading(true);
-        axios
-          .post("http://localhost:8000/upload", {
-            file: previewSource,
-          })
-          .then((res) => {
-            if (res?.data?.error) {
-              return;
-            }
-            axios
-              .post("http://localhost:8000/post/create_post", {
-                cover: res?.data?.data?.secure_url,
-                caption: caption ? caption : null,
-              })
-              .then((res) => {
-                console.log(res);
-                setLoading(false);
-              })
-              .catch((err) => {
-                setLoading(false);
-                console.log(err);
-              });
-          })
-          .catch((err) => {
-            setLoading(false);
-            console.log(err);
-          });
-      } catch (error) {
-        setLoading(false);
-      }
-    } else {
-      console.log("inside else block");
-      axios
-        .post("http://localhost:8000/post/create_post", {
-          body,
-        })
-        .then((res) => {
-          console.log(res);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-        });
-    }
+    const data = {
+      previewSource: previewSource ? previewSource : null,
+      caption: caption ? caption : null,
+      userId: user?._id ? user?._id : null,
+      body: body ? body : null,
+    };
+    const res = await createPost(data);
+    console.log({ res });
   };
 
   const deletePreview = () => {
@@ -141,10 +105,9 @@ const CreatePost: NextPageWithLayout = () => {
                   <Delete className="h-8" />
                 </span>
                 <Image
-                  height="20"
-                  width="20"
+                  height="90"
+                  width="360"
                   className="rounded-lg"
-                  layout="responsive"
                   src={previewSource}
                   alt="Cover"
                 />
@@ -206,7 +169,7 @@ const CreatePost: NextPageWithLayout = () => {
         className="w-full py-padding-y-btn mt-10 text-center text-btn-text font-bold text-accent-primary border-2 hover:bg-[#ab3eff1a] transition-opacity duration-150
        border-accent-primary rounded-rounded-body mb-2"
       >
-        {!loading ? "Post" : <GhostBtnLoader />}
+        {!isLoading ? "Post" : <GhostBtnLoader />}
       </button>
     </div>
   );

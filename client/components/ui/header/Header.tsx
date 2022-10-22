@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/future/image";
 import { useRouter } from "next/router";
 import { useAuthContext } from "../../../hooks/useAuthContext";
 import { Logout } from "../icons";
@@ -20,7 +20,7 @@ const Header = () => {
         </h1>
       ) : (
         <div className="w-2/5">
-          <Image height="" layout="responsive" width="" src={logo} alt="" />
+          <Image height="" width="" src={logo} alt={logo} />
         </div>
       )}
       <span onClick={handleLogout} className="cursor-pointer">

@@ -22,7 +22,7 @@ const AssignUsernameAvatar = () => {
     <div className="w-full h-[80vh] flex items-center justify-center">
       <div className="px-6 w-full flex flex-col items-center justify-center">
         <div className="bg-gray-300 h-36 w-36 rounded-full ring-2 ring-accent-primary">
-          <img src={avatar} alt="" />
+          {/* <img src={avatar} alt="" /> */}
         </div>
         <div className="border-2 w-full text-center rounded-lg py-6 mt-4 border-slate-200 px-4">
           <p className="text-2xl">Ritesh Kumar Behera</p>
