@@ -39,6 +39,19 @@ export interface PostResponse {
   status: string;
 }
 
+export interface Comment {
+  content: string;
+  post: Post;
+  created_by: IUser;
+}
+
 export interface Post {
-  posts: any[];
+    _id: string;
+    cover?: string;
+    body?: string;
+    created_by: IUser;
+    likes: [IUser];
+    comments?: [Comment];
+    caption?: string;
+    created_at: Date
 }

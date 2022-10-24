@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { Schema, model, Types } from "mongoose";
+import { Schema, model, ObjectId } from "mongoose";
 import { IPost } from "../../types";
 
 const postSchema = new Schema<IPost>({
@@ -14,13 +14,13 @@ const postSchema = new Schema<IPost>({
   },
   likes: [
     {
-      type: Types.ObjectId,
+      type: "ObjectId",
       ref: "User",
     },
   ],
   comments: [
     {
-      type: Types.ObjectId,
+      type: "ObjectId",
       ref: "Comment",
     },
   ],
@@ -29,26 +29,14 @@ const postSchema = new Schema<IPost>({
     ref: "User",
     required: true,
   },
-  created_at: {
-    type: "Date",
-    required: true,
-    default: Date.now(),
-  },
-  //   comments: [
-  //     {
-  //       type: String,
-  //       created_by: {
-  //         type: "ObjectID",
-  //         ref: "User",
-  //       },
-  //     },
-  //   ],
+}, {
+  timestamps: {createdAt: 'created_at'}
 });
 
-// postSchema.pre("/^find/", function (next: NextFunction) {
-//   this.populate("likes");
-//   next();
-// });
+postSchema.pre("/^find/", function (next: NextFunction) {
+  this.populate("likes");
+  next();
+});
 
 const Post = model("Post", postSchema);
 export default Post;

@@ -1,6 +1,6 @@
 import Image from "next/future/image";
 import { useRouter } from "next/router";
-import { useAuthContext } from "../../../hooks/useAuthContext";
+import { useAuthContext } from "../../../hooks/auth/useAuthContext";
 import { Logout } from "../icons";
 import logo from "./../../../public/assets/logo.svg";
 

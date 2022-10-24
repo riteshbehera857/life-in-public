@@ -22,7 +22,7 @@ export interface IPost {
     type: Types.ObjectId;
   };
   comments?: [Types.ObjectId];
-  created_at?: Date;
+  timestamp: boolean;
 }
 
 export interface IComment {

@@ -12,6 +12,8 @@ export const authReducer = (state: any, action: any) => {
   switch (action.type) {
     case "LOGIN":
       return { user: action.payload };
+    case "REFRESH":
+      return {user: action.payload }
     case "LOGOUT":
       return { user: null };
     default:
@@ -23,18 +25,6 @@ export const AuthContextProvider = ({ children }: any) => {
     user: null,
   });
   const router = useRouter();
-
-  useEffect(() => {
-    console.log("%c Inside First useEffect...", "color: red");
-    axios
-      .get(GET_USER, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        dispatch({ type: "LOGIN", payload: res?.data?.user });
-      })
-      .catch((err) => console.log(err));
-  }, []);
 
   useEffect(() => {
     if (!state.user) {

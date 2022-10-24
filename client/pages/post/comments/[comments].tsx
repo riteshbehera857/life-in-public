@@ -5,43 +5,42 @@ import { useRouter } from "next/router";
 import useSwr, { useSWRConfig } from "swr";
 
 import { ArrowLeft, Send } from "../../../components/ui/icons";
-import { useAuthContext } from "../../../hooks/useAuthContext";
-import { useComment } from "../../../hooks/useComment";
+import { useAuthContext } from "../../../hooks/auth/useAuthContext";
 
 import avatar from "../../../public/images/avatar.svg";
+import { COMMENT, CREATE_COMMENT } from "../../../constants";
+import NoContent from "@components/posts/NoContent";
+import no_comment from '@assets/no_comment.svg'
 
 const Comments = () => {
   const router = useRouter();
   const param = router?.query?.comments;
   const { mutate } = useSWRConfig();
 
-  const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${process.env.NEXT_PUBLIC_BACKEND_PORT}${process.env.NEXT_PUBLIC_BACKEND_POST_END_POINT}`;
-
   const [comment, setComment] = useState<string>("");
 
   const { user } = useAuthContext();
 
   const fetchComments = async () => {
-    const res = await axios.get(`${API_URL}/${param}`);
+    const res = await axios.get(`${COMMENT}/${param}`);
     return res;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post(`http://localhost:8000/comment/create`, {
+    await axios.post(CREATE_COMMENT, {
       content: comment,
       created_by: user._id,
       post: param,
     });
 
     setComment("");
-    mutate(`${API_URL}/${param}`);
+    mutate(`${COMMENT}/${param}`);
   };
-  const { data, error } = useSwr(`${API_URL}/${param}`, fetchComments);
-
+  const { data, error } = useSwr(`${COMMENT}/${param}`, fetchComments);
+  console.log({data})
   //   if (!data) console.log("Loading");
   //   if (data) console.log("Loaded");
-  if (typeof window === "undefined") {
     return (
       <div className="px-6">
         <div className="h-[8vh] flex gap-8 items-center">
@@ -51,11 +50,8 @@ const Comments = () => {
           />
           <h3 className="text-[2.4rem] font-bold">Comments</h3>
         </div>
-        {!data && typeof window === "undefined" ? (
-          <h1>Loading..</h1>
-        ) : (
           <div className="h-[82vh]">
-            {data?.data?.data?.post?.comments?.map((comment) => (
+          {!data?.data?.data?.post?.comments.length ? <NoContent displayImg={no_comment} body="This post has no comments"/> : data?.data?.data?.post?.comments?.map((comment) => (
               <div key={comment._id} className="flex mb-4 items-center">
                 <div className="mr-4">
                   <Image src={avatar} height="" width="" alt="avatar" />
@@ -70,7 +66,6 @@ const Comments = () => {
               </div>
             ))}
           </div>
-        )}
         <form
           onSubmit={handleSubmit}
           className="fixed flex items-center gap-4 bottom-2 left-1/2 -translate-x-1/2 w-screen px-6"
@@ -89,7 +84,6 @@ const Comments = () => {
         </form>
       </div>
     );
-  }
 };
 
 export default Comments;

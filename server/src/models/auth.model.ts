@@ -32,13 +32,13 @@ const userSchema = new Schema<IUser>({
   },
   posts: [
     {
-      type: Types.ObjectId,
+      type: "ObjectId",
       ref: "Post",
     },
   ],
   likedPosts: [
     {
-      type: Types.ObjectId,
+      type: "ObjectId",
       ref: "Post",
     },
   ],

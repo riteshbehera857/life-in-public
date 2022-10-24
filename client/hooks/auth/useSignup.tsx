@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { SIGNUP } from "../constants";
-import { IRegisterResponse } from "../types";
+import { SIGNUP } from "../../constants";
+import { IRegisterResponse } from "../../types";
 
 export const useSignup = () => {
   const [error, setError] = useState<null | string | undefined>(null);

@@ -1,8 +1,8 @@
-import { PostContext } from "../context/PostContext";
+import { AuthContext } from "../../context/AuthContext";
 import { useContext } from "react";
 
-export const usePostContext = () => {
-  const context = useContext(PostContext);
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
 
   if (!context)
     throw new Error(

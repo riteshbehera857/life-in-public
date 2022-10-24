@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { Layout } from "../../components";
-import { useAuthContext } from "../../hooks/useAuthContext";
+import { useAuthContext } from "../../hooks/auth/useAuthContext";
 
 const Profile = () => {
   const { user } = useAuthContext();

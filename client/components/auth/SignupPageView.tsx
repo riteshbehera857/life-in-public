@@ -4,7 +4,7 @@ import { useState, BaseSyntheticEvent, SyntheticEvent } from "react";
 import { BtnLoder } from "./../";
 import { ILogin, IRegisterResponse } from "./../../types";
 import { Eye, EyeOff } from "../ui/icons";
-import { useSignup } from "./../../hooks/useSignup";
+import { useSignup } from "../../hooks/auth/useSignup";
 
 interface ISignup extends ILogin {
   firstname: string;

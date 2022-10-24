@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
-import { useAuthContext } from "../../../hooks/useAuthContext";
+import { useAuthContext } from "../../../hooks/auth/useAuthContext";
 import { Add, Bell, Home, HomeFill, Profile, ProfileFill } from "../icons";
 
 const Navbar = () => {

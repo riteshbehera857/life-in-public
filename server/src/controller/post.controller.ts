@@ -6,10 +6,24 @@ import File from "../models/files.model";
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const posts = await Post.find()
+    const queryObj = {...req.query}
+    const sort:any = req.query.sort
+    const excludedFields = ['limit', 'fields']
+    excludedFields.forEach(el => delete queryObj[el])
+
+    let queryStr = JSON.stringify(queryObj)
+    queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
+
+    let query = Post.find(JSON.parse(queryStr))
       .populate("created_by")
       .populate("likes")
-      .sort({ created_at: 1 });
+
+    const posts = await query
+
+    if (sort) {
+      query = query.sort({sort: -1})
+    }
+
     res.status(200).json({
       status: "success",
       error: false,
@@ -88,7 +102,7 @@ const updatePostLikes = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { id }:any = req.params;
     if (!id) throw new Error("Please provide a valid postID");
 
     const { userID } = req.body;
@@ -107,10 +121,20 @@ const updatePostLikes = async (
           },
           { multi: true }
         );
+        await User.findByIdAndUpdate(
+          userID, {
+            $pull: {
+              likedPosts: id
+            }
+          }
+        )
 
         return res.status(200).json({
           status: "success",
           error: false,
+          data: {
+            post: await Post.findById(id)
+          }
         });
       } catch (error) {
         next(error);
@@ -131,6 +155,9 @@ const updatePostLikes = async (
       res.status(200).json({
         status: "success",
         error: false,
+        data: {
+            post: await Post.findById(id)
+        }
       });
     }
   } catch (error) {

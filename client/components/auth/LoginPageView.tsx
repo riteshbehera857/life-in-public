@@ -3,12 +3,13 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { useAuthContext } from "../../hooks/useAuthContext";
-import { useLogin } from "../../hooks/useLogin";
+import { useAuthContext } from "@hooks/auth/useAuthContext";
+import { useLogin } from "@hooks/auth/useLogin";
+import { useUser } from "@hooks/auth/useUser";
 
 import { ILogin } from "./../../types";
-import { BtnLoder } from "./../";
-import { Eye, EyeOff } from "../ui/icons";
+import { BtnLoder } from "@components/ui/loaders";
+import { Eye, EyeOff } from "@components/ui/icons";
 import { GET_USER } from "../../constants";
 
 axios.defaults.withCredentials = true;
@@ -16,6 +17,7 @@ axios.defaults.withCredentials = true;
 const LoginPageView = () => {
   const router = useRouter();
   const { dispatch } = useAuthContext();
+  const { refreshUser } = useUser()
 
   const [loginData, setLoginData] = useState<ILogin>({
     email: "",
@@ -33,32 +35,21 @@ const LoginPageView = () => {
     setLoginData({ email: "", password: "" });
   };
 
-  useEffect(() => {
-    console.log(isLoading ? "Loading..." : "Not Loading...");
-  }, [isLoading]);
-
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
+
     const data = await login(loginData.email, loginData.password);
-    console.log({ data });
-    if (!data?.error) {
-      console.log("Hello");
-      axios
-        .get(GET_USER, {
-          withCredentials: true,
-        })
-        .then((res) => {
-          console.log(res);
-          dispatch({ type: "LOGIN", payload: res?.data?.user });
-          router.push("/");
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          setError(err);
-          setIsLoading(false);
-          clear();
-        });
+
+    if (data?.error) {
+      setError(data?.message);
+      setIsLoading(false);
+      clear();
+      return;
     }
+      
+    await refreshUser()
+    router.push("/");
+    setIsLoading(false);
   };
 
   return (

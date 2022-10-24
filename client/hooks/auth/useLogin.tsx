@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
-import { ILoginResponse } from "../types";
-import { LOGIN } from "../constants";
+import { ILoginResponse } from "../../types";
+import { LOGIN } from "../../constants";
 
 export const useLogin = () => {
   const [error, setError] = useState<null | string | undefined>(null);
