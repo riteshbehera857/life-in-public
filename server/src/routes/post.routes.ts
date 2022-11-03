@@ -14,5 +14,4 @@ router.route("/").get(getPosts);
 router.route("/:id").get(getPost).delete(deletePost);
 router.route("/create_post").post(createPost);
 router.route("/update-post-likes/:id").patch(updatePostLikes);
-
 export default router;

@@ -19,12 +19,12 @@
   --padding-y-btn: 2rem;
 
   --input-padding-x: 2.1rem;
-  --input-padding-y: 3.3rem;
+  --input-padding-y: 3.2rem;
 
   --border-radius: 1.6rem;
 
   --primary-heading: 2.7rem;
-  --text-body: 1.6rem;
+  --text-body: 1.8rem;
   --text-btn: 2.2rem;
 
   --xs-device: 360px;
@@ -278,3 +278,23 @@ animation: heartPop .5s ease-in-out;
     transform: scale(1);
   }
 }
+
+.loader {
+    width: 28px;
+    height: 28px;
+    border: 4px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+@keyframes rotation {
+0% {
+    transform: rotate(0deg);
+}
+100% {
+    transform: rotate(360deg);
+}
+} 

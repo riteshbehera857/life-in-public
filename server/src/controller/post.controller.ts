@@ -18,11 +18,12 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
       .populate("created_by")
       .populate("likes")
 
+    if (sort) {
+      query = query.sort(`-${sort}`)
+    }
+
     const posts = await query
 
-    if (sort) {
-      query = query.sort({sort: -1})
-    }
 
     res.status(200).json({
       status: "success",

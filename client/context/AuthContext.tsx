@@ -13,7 +13,7 @@ export const authReducer = (state: any, action: any) => {
     case "LOGIN":
       return { user: action.payload };
     case "REFRESH":
-      return {user: action.payload }
+      return { user: action.payload };
     case "LOGOUT":
       return { user: null };
     default:
@@ -25,7 +25,6 @@ export const AuthContextProvider = ({ children }: any) => {
     user: null,
   });
   const router = useRouter();
-
   useEffect(() => {
     if (!state.user) {
       router.push("/auth/login");

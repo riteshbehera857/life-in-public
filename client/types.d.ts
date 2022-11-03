@@ -29,6 +29,9 @@ export interface IUser {
   firstname: string;
   lastname: string;
   email: string;
+  username: string;
+  avatar: string;
+  fakeEmail: string;
   likedPosts: [];
   posts: [];
 }

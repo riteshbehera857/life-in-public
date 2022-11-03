@@ -62,14 +62,14 @@ const CreatePostView = () => {
       <PageHeader backHref="/" />
       <PostForm
         body={body}
-        setBody={setBody}
+        onChange={(e) => setBody(e.target.value)}
         handleRef={handleRef}
         previewSource={previewSource}
         deletePreview={deletePreview}
         myRef={myRef}
-        handleFileChange={handleFileChange}
+        handleFileChange={(e) => setSelectedFile(e.target.files[0])}
         caption={caption}
-        setCaption={setCaption}
+        onCaptionInputChange={(e) => setCaption(e.target.value)}
         fileUploadEnabled={fileUploadEnabled}
         setFileUploadEnabled={setFileUploadEnabled}
       />

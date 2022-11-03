@@ -24,7 +24,7 @@ const MediaUploadForm = ({
       <Input
         type="text"
         value={caption}
-        label="Caption for the post"
+        label="Caption"
         name="caption"
         onChange={handleInputChange}
         placeholder="Capiton"

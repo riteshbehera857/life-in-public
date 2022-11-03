@@ -5,6 +5,7 @@ import { config } from "dotenv";
 import morgan from 'morgan'
 import authRoutes from "./src/routes/auth.routes";
 import userRoutes from "./src/routes/user.routes";
+import likeRoutes from "./src/routes/like.routes"
 import postRoutes from "./src/routes/post.routes";
 import commentRoutes from "./src/routes/comment.routes";
 import errorHandler from "./src/middlewares/error.handler";
@@ -27,6 +28,7 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/comment", commentRoutes);
+app.use("/like", likeRoutes)
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const err = new Error(`Can't find ${req.originalUrl} path on the server`);

@@ -56,7 +56,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('password');
 
     if (!user || !(await compareHash(password, user.password))) {
       res.json({

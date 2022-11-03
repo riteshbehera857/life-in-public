@@ -29,6 +29,34 @@ export const getCurrentUser = async (
   }
 };
 
+export const updateUser = async (req: Request,
+  res: Response,
+  next: NextFunction) => {
+  try {
+    const { id } = req.params
+    const {username, avatar, fakeEmail} = req.body
+    if (!id) {
+      return res.status(404).json({
+        status: 'fail',
+        error: true
+      })
+    }
+    
+    await User.findByIdAndUpdate(id, {
+      username: username ?? username,
+      avatar: avatar ?? avatar,
+      fakeEmail: fakeEmail ?? fakeEmail
+    })
+
+    res.status(200).json({
+      status: 'success',
+      error: false
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const updateUserPosts = async (
   req: Request,
   res: Response,

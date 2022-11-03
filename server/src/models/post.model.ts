@@ -30,7 +30,7 @@ const postSchema = new Schema<IPost>({
     required: true,
   },
 }, {
-  timestamps: {createdAt: 'created_at'}
+  timestamps: true
 });
 
 postSchema.pre("/^find/", function (next: NextFunction) {

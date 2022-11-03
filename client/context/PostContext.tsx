@@ -17,6 +17,7 @@ export const postReducer = (state: Post, action: any) => {
 };
 export const PostContextProvider = ({ children }: any) => {
   const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${process.env.NEXT_PUBLIC_BACKEND_PORT}${process.env.NEXT_PUBLIC_BACKEND_POST_END_POINT}`;
+
   const [state, dispatch] = useReducer(postReducer, {
     posts: null,
   });
@@ -24,7 +25,7 @@ export const PostContextProvider = ({ children }: any) => {
   useEffect(() => {
     let subscribe = true;
     axios
-      .get<PostResponse>(API_URL)
+      .get<PostResponse>(`${API_URL}?sort=createdAt`)
       .then((res) => {
         if (subscribe) {
           if (!state.posts && res.data?.data?.posts) {

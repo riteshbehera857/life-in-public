@@ -11,13 +11,14 @@ import { ILogin } from "./../../types";
 import { BtnLoder } from "@components/ui/loaders";
 import { Eye, EyeOff } from "@components/ui/icons";
 import { GET_USER } from "../../constants";
+import Input from "@components/forms/Input";
 
 axios.defaults.withCredentials = true;
 
 const LoginPageView = () => {
   const router = useRouter();
   const { dispatch } = useAuthContext();
-  const { refreshUser } = useUser()
+  const { refreshUser } = useUser();
 
   const [loginData, setLoginData] = useState<ILogin>({
     email: "",
@@ -46,9 +47,8 @@ const LoginPageView = () => {
       clear();
       return;
     }
-      
-    await refreshUser()
-    router.push("/");
+
+    await refreshUser();
     setIsLoading(false);
   };
 
@@ -72,22 +72,30 @@ const LoginPageView = () => {
         )}
         <div className="w-full">
           <form onSubmit={handleSubmit} className="w-full">
-            <input
+            <Input
+              type="email"
+              name="email"
+              label="Email Address"
+              placeholder="Email Address"
+              value={loginData.email}
+              onChange={handleInput}
+            />
+            {/* <input
               type="email"
               name="email"
               value={loginData.email}
               onChange={handleInput}
               className="py-padding-y-input w-full border border-accent-primary rounded-rounded-body mb-[12px] text-text-body font-bold px-padding-x-input text-[#9d9d9d] focus:outline-[#aa3eff]"
               placeholder="Email Address"
-            />
+            /> */}
             <div className="relative mb-[74px]">
-              <input
+              <Input
                 type={passwordType ? "password" : "text"}
                 name="password"
+                label="Password"
+                placeholder="Password"
                 value={loginData.password}
                 onChange={handleInput}
-                className="py-padding-y-input border border-accent-primary text-text-body w-full rounded-rounded-body px-padding-x-input font-bold text-[#9d9d9d] focus:outline-[#aa3eff]"
-                placeholder="Password"
               />
               <span
                 onClick={() => setPasswordType((prev) => !prev)}

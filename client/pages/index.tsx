@@ -12,22 +12,24 @@ import { GET_POST, LIKE } from "../constants";
 import { usePost } from "@hooks/post/usePost";
 import { usePostContext } from "@hooks/post/usePostContext";
 import PostBlock from "@components/posts/PostBlock";
-import no_post from "@assets/no_post.svg"
+import no_post from "@assets/no_post.svg";
 import Image from "next/future/image";
 import NoContent from "@components/posts/NoContent";
-// import NoPost from "@components/ui/loaders/NoPost";
 
 const Home = () => {
-  const { posts } = usePostContext()
-  
+  const { posts } = usePostContext();
+
   return (
     <div className="px-6 pt-[2.5rem]">
-      {!posts?.length ? <NoContent displayImg={no_post} body="Oops no posts available" /> : posts?.map((post) => (
-        <div
-          key={post?._id} className="mb-10 last:mb-32">
-          <PostBlock post={post} />
+      {!posts?.length ? (
+        <NoContent displayImg={no_post} body="Oops no posts available" />
+      ) : (
+        posts?.map((post) => (
+          <div key={post?._id} className="mb-10 last:mb-32">
+            <PostBlock post={post} />
           </div>
-        ))}
+        ))
+      )}
     </div>
   );
 };

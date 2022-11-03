@@ -1,16 +1,18 @@
+import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { usePost } from "./usePost";
 import { usePostContext } from "./usePostContext";
 
 export const useCreatePost = () => {
-  const [error, setError] = useState<null | string | undefined>(null);
-  const [isLoading, setIsLoading] = useState<boolean | undefined>();
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
 
   const { dispatch } = usePostContext();
+  const { refreshPost } = usePost();
 
   const createPost = async ({ previewSource, caption, userId, body }) => {
     setIsLoading(true);
@@ -42,7 +44,7 @@ export const useCreatePost = () => {
         }
       );
       setIsSuccess(true);
-      dispatch({ type: "POST", payload: res?.data?.data?.posts });
+      await refreshPost();
       setIsLoading(false);
       router.push("/");
     } catch (error) {

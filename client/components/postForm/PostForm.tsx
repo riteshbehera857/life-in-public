@@ -9,31 +9,40 @@ import MediaUploadForm from "./MediaUploadForm";
 
 interface IProps {
   body: string;
-  setBody: Dispatch<SetStateAction<string>>;
+  onChange: (e) => void;
   handleRef: () => void;
   previewSource: null | string;
   deletePreview: () => void;
   myRef: MutableRefObject<HTMLInputElement>;
   handleFileChange: (e) => void;
   caption: string;
-  setCaption: Dispatch<SetStateAction<string>>;
+  onCaptionInputChange: (e) => void;
   fileUploadEnabled: boolean;
   setFileUploadEnabled: Dispatch<SetStateAction<boolean>>;
 }
 
 const PostForm: React.FC<IProps> = ({
   body,
-  setBody,
+  onChange,
   handleRef,
   previewSource,
   deletePreview,
   myRef,
   handleFileChange,
   caption,
-  setCaption,
+  onCaptionInputChange,
   fileUploadEnabled,
   setFileUploadEnabled,
 }) => {
+  const handleTextAreaChange = (e) => {
+    onChange(e);
+  };
+  const handleFileInputChange = (e) => {
+    handleFileChange(e);
+  };
+  const handleCaptionInputChange = (e) => {
+    onCaptionInputChange(e);
+  };
   return (
     <>
       {!fileUploadEnabled && (
@@ -43,7 +52,7 @@ const PostForm: React.FC<IProps> = ({
           className="mb-4"
           value={body}
           placeholder="Tell everyone about your day.."
-          onChange={(e) => setBody(e.target.value)}
+          onChange={handleTextAreaChange}
         />
       )}
       {fileUploadEnabled && (
@@ -53,9 +62,9 @@ const PostForm: React.FC<IProps> = ({
             previewSource={previewSource}
             deletePreview={deletePreview}
             myRef={myRef}
-            handleFileChange={handleFileChange}
+            handleFileChange={handleFileInputChange}
             caption={caption}
-            handleInputChange={(e) => setCaption(e.target.value)}
+            handleInputChange={handleCaptionInputChange}
           />
         </>
       )}

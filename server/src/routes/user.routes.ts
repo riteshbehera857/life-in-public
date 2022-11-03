@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getCurrentUser,
+  updateUser,
   updateUserLikedPosts,
   updateUserPosts,
 } from "../controller/user.controller";
@@ -8,6 +9,7 @@ import {
 const router = express.Router();
 
 router.route("/").get(getCurrentUser);
+router.route("/:id").patch(updateUser)
 router.route("/update-likes/:id").patch(updateUserLikedPosts);
 router.route("/update-posts/:id").patch(updateUserPosts);
 

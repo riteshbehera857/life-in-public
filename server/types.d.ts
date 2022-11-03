@@ -9,6 +9,7 @@ export interface IUser {
   username: string;
   password: string;
   cover: string;
+  fakeEmail: string;
   posts: [Types.ObjectId];
   likedPosts: any[];
 }
