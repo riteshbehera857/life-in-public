@@ -1,182 +1,120 @@
-import { Request, Response, NextFunction } from "express";
-import { cloudinary } from "../../cloudinary";
-import User from "../models/auth.model";
-import Post from "../models/post.model";
-import File from "../models/files.model";
+import { IGetUserAuthInfoRequest } from './../middlewares/auth.handler';
+import { Request, Response, NextFunction } from 'express';
+import { cloudinary } from '../cloudinary';
+import Post from '../models/post.model';
+import File from '../models/files.model';
+import Follows from '../models/follow.model';
+import { catchAsync } from '../utils/catchAsync';
+import { AppError } from '..//utils/appError';
 
-const getPosts = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const queryObj = {...req.query}
-    const sort:any = req.query.sort
-    const excludedFields = ['limit', 'fields']
-    excludedFields.forEach(el => delete queryObj[el])
+export const getPosts = catchAsync(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    // const queryObj = { ...req.query };
+    const sort: any = req.query.sort;
+    const fields: any = req.query.fields;
 
-    let queryStr = JSON.stringify(queryObj)
-    queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
+    const requestedUser = req.params.requestedUser;
+    const loggedinUser = req.user._id;
 
-    let query = Post.find(JSON.parse(queryStr))
-      .populate("created_by")
-      .populate("likes")
+    const loggedinUserFollowings: any = await Follows.find({
+      follower: loggedinUser,
+    }).distinct('following');
+
+    const followings = [...loggedinUserFollowings, loggedinUser];
+
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    let query = Post.find({
+      created_by: {
+        $in: followings,
+      },
+    });
+
+    if (requestedUser)
+      query = Post.find({
+        created_by: requestedUser,
+      });
 
     if (sort) {
-      query = query.sort(`-${sort}`)
+      query = query.sort(`-${sort}`);
+    } else {
+      query = query.sort('-createdAt');
     }
 
-    const posts = await query
+    if (fields) {
+      const requestedFields = fields.split(',').join(' ');
+      query = query.select(requestedFields);
+    } else {
+      query = query.select('-__v');
+    }
 
+    const posts = await query;
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       error: false,
+      results: posts.length,
       data: {
         posts,
       },
     });
-  } catch (error) {
-    next(error);
   }
-};
+);
 
-const getPost = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+export const getPost = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const post = await Post.findById(id)
-      .populate("likes")
-      .populate("created_by")
-      .populate({
-        path: "comments",
-        populate: {
-          path: "created_by",
-          model: "User",
-        },
-      });
+    const post = await Post.findById(id).populate({
+      path: 'comments',
+      populate: {
+        path: 'createdBy',
+        model: 'User',
+      },
+    });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       error: false,
       data: {
         post,
       },
     });
-  } catch (error) {
-    next(error);
   }
-};
+);
 
-const createPost = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { caption, likes, body, created_by } = req.body;
-    let uploadedFile;
-    if (req.body.file) {
-      const uploadedResponse = await cloudinary.uploader.upload(req.body.file);
-      await File.create({ file: uploadedResponse?.secure_url });
-      uploadedFile = uploadedResponse?.secure_url;
+export const createPost = catchAsync(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const user = req.user._id;
+
+    if (!Object.keys(req.body).length) {
+      return next(new AppError('Please provide all the required fields', 406));
     }
-    if (!req.body) throw new Error("Please fill all the required fields");
 
-    const post = await Post.create({
-      cover: uploadedFile ? uploadedFile : null,
-      body,
-      caption,
-      likes,
-      created_by,
+    const newPost = await Post.create({
+      ...req.body,
+      createdBy: user,
     });
 
-    await User.findByIdAndUpdate(post.created_by, {
-      $push: {
-        posts: post._id,
-      },
-    });
+    const post = await Post.find({ _id: newPost._id });
 
     res.status(201).json({
-      status: "success",
+      status: 'success',
       error: false,
+      data: {
+        post,
+      },
     });
-  } catch (error) {
-    next(error);
   }
-};
+);
 
-const updatePostLikes = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id }:any = req.params;
-    if (!id) throw new Error("Please provide a valid postID");
-
-    const { userID } = req.body;
-    if (!userID) throw new Error("Please provide a valid userID");
-
-    const post = await Post.findOne({ _id: id });
-
-    if (post?.likes?.includes(userID)) {
-      try {
-        await Post.findByIdAndUpdate(
-          id,
-          {
-            $pull: {
-              likes: userID,
-            },
-          },
-          { multi: true }
-        );
-        await User.findByIdAndUpdate(
-          userID, {
-            $pull: {
-              likedPosts: id
-            }
-          }
-        )
-
-        return res.status(200).json({
-          status: "success",
-          error: false,
-          data: {
-            post: await Post.findById(id)
-          }
-        });
-      } catch (error) {
-        next(error);
-      }
-    } else {
-      await Post.findByIdAndUpdate(id, {
-        $push: {
-          likes: userID,
-        },
-      });
-
-      await User.findByIdAndUpdate(userID, {
-        $push: {
-          likedPosts: id,
-        },
-      });
-
-      res.status(200).json({
-        status: "success",
-        error: false,
-        data: {
-            post: await Post.findById(id)
-        }
-      });
-    }
-  } catch (error) {
-    next(error);
-  }
-};
-
-const deletePost = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+export const deletePost = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     await Post.findByIdAndDelete(id);
     res.status(200).json({
-      status: "success",
+      status: 'success',
       error: false,
     });
-  } catch (error) {
-    next(error);
   }
-};
-
-export { getPosts, getPost, createPost, updatePostLikes, deletePost };
+);

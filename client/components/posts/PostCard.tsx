@@ -3,19 +3,31 @@ import PostActions from "./PostActions";
 import { IUser, Post } from "../../types";
 import PostBody from "./PostBody";
 import { useDispatch } from "react-redux";
-import { increment } from "../../redux/counter/counterSlice";
 
 interface IProps {
   post: Post;
-  handleLike: (id) => Promise<void>;
+  handleLike: () => void;
+  totalLikes: number;
   liked: boolean;
 }
 
-const PostCard = ({ post, handleLike, liked }: IProps) => {
+const PostCard = ({ post, handleLike, liked, totalLikes }: IProps) => {
   return (
     <>
-      <PostBody post={post} />
-      <PostActions post={post} handleLike={handleLike} liked={liked} />
+      <PostBody
+        post={post}
+        handleLike={handleLike}
+        liked={liked}
+        totalLikes={totalLikes}
+      />
+      {post?.body && (
+        <PostActions
+          post={post}
+          handleLike={handleLike}
+          liked={liked}
+          totalLikes={totalLikes}
+        />
+      )}
     </>
   );
 };

@@ -1,16 +1,22 @@
-import express from "express";
+import express from 'express';
+import protectRoute from '../middlewares/auth.handler';
 import {
-  getCurrentUser,
+  getMe,
+  getUser,
+  searchUsers,
   updateUser,
-  updateUserLikedPosts,
-  updateUserPosts,
-} from "../controller/user.controller";
+} from '../controller/user.controller';
+import followRoutes from '../routes/follow.routes';
+import postRoutes from '../routes/post.routes';
 
 const router = express.Router();
 
-router.route("/").get(getCurrentUser);
-router.route("/:id").patch(updateUser)
-router.route("/update-likes/:id").patch(updateUserLikedPosts);
-router.route("/update-posts/:id").patch(updateUserPosts);
+router.use('/:following/follow', followRoutes);
+router.use('/:requestedUser/post', postRoutes);
+
+router.route('/me').get(protectRoute, getMe, getUser);
+
+router.route('/search').get(searchUsers);
+router.route('/:id').get(getUser).patch(updateUser);
 
 export default router;

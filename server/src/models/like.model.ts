@@ -1,20 +1,25 @@
-import { Schema, model, Model } from "mongoose";
-import Post from './post.model'
-import User from './auth.model'
+import { Schema, model, Model } from 'mongoose';
 
-const likesSchema = new Schema({
+const likesSchema = new Schema(
+  {
     post: {
-        type: "ObjectID",
-        ref: "Post"
+      type: 'ObjectID',
+      ref: 'Post',
     },
     user: {
-        type: "objectID",
-        ref: "User"
-    }
-}, {
-    timestamps: true
-})
+      type: 'ObjectID',
+      ref: 'User',
+    },
+  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  }
+);
 
-const Likes = model("Likes", likesSchema)
+likesSchema.index({ post: 1 });
 
-export default Likes
+const Likes = model('Likes', likesSchema);
+
+export default Likes;

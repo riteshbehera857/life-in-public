@@ -1,51 +1,35 @@
+import { useAuthContext } from "@hooks/auth/useAuthContext";
 import axios from "axios";
 import { createContext, useEffect, useReducer, useState } from "react";
+import useSWR from "swr";
 import { Post, PostResponse } from "../types";
-// import useRouter from "next/router";
 
-export const PostContext = createContext<any>(null);
+interface PostContext {
+  posts: Post[];
+  postError: any;
+}
 
-export const postReducer = (state: Post, action: any) => {
-  switch (action.type) {
-    case "POST":
-      return { ...state, posts: action.payload };
-    case "REFRESH":
-      return { posts: action.payload };
-    default:
-      return state;
-  }
-};
+export const PostContext = createContext<PostContext>(null);
+
 export const PostContextProvider = ({ children }: any) => {
-  const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${process.env.NEXT_PUBLIC_BACKEND_PORT}${process.env.NEXT_PUBLIC_BACKEND_POST_END_POINT}`;
+  const FETCH_POSTS_URL = `http://localhost:8000/api/v1/post`;
 
-  const [state, dispatch] = useReducer(postReducer, {
-    posts: null,
-  });
+  const fetchPosts = async (url) => {
+    const res = await axios.get(url);
+    return res.data;
+  };
 
-  useEffect(() => {
-    let subscribe = true;
-    axios
-      .get<PostResponse>(`${API_URL}?sort=createdAt`)
-      .then((res) => {
-        if (subscribe) {
-          if (!state.posts && res.data?.data?.posts) {
-            dispatch({ type: "POST", payload: res?.data?.data?.posts });
-          }
-        }
-      })
-      .catch((err) => console.error(err));
-
-    return () => {
-      subscribe = false;
-    };
-  }, [state?.posts]);
-
-  // useEffect(() => {
-  //   console.log({ state: state?.posts });
-  // }, [state?.posts]);
+  const { data: postData, error: postError } = useSWR(
+    FETCH_POSTS_URL,
+    fetchPosts,
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 3600000,
+    }
+  );
 
   return (
-    <PostContext.Provider value={{ ...state, dispatch }}>
+    <PostContext.Provider value={{ posts: postData?.data?.posts, postError }}>
       {children}
     </PostContext.Provider>
   );

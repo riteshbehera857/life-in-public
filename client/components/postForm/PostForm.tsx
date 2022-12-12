@@ -10,29 +10,29 @@ import MediaUploadForm from "./MediaUploadForm";
 interface IProps {
   body: string;
   onChange: (e) => void;
-  handleRef: () => void;
+  onDrop: (e) => void;
   previewSource: null | string;
   deletePreview: () => void;
-  myRef: MutableRefObject<HTMLInputElement>;
   handleFileChange: (e) => void;
   caption: string;
   onCaptionInputChange: (e) => void;
   fileUploadEnabled: boolean;
+  fileUploading: boolean;
   setFileUploadEnabled: Dispatch<SetStateAction<boolean>>;
 }
 
 const PostForm: React.FC<IProps> = ({
   body,
   onChange,
-  handleRef,
   previewSource,
   deletePreview,
-  myRef,
   handleFileChange,
   caption,
+  fileUploading,
   onCaptionInputChange,
   fileUploadEnabled,
   setFileUploadEnabled,
+  onDrop,
 }) => {
   const handleTextAreaChange = (e) => {
     onChange(e);
@@ -58,10 +58,10 @@ const PostForm: React.FC<IProps> = ({
       {fileUploadEnabled && (
         <>
           <MediaUploadForm
-            handleRef={handleRef}
+            onDrop={onDrop}
             previewSource={previewSource}
             deletePreview={deletePreview}
-            myRef={myRef}
+            fileUploading={fileUploading}
             handleFileChange={handleFileInputChange}
             caption={caption}
             handleInputChange={handleCaptionInputChange}

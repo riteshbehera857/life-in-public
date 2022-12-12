@@ -1,76 +1,101 @@
-import { NextFunction, Request, Response } from 'express'
-import Like from './../models/like.model'
+import { catchAsync } from './../utils/catchAsync';
+import { AppError } from './../utils/appError';
+import { IGetUserAuthInfoRequest } from './../middlewares/auth.handler';
+import { NextFunction, Request, Response } from 'express';
+import Like from './../models/like.model';
 
-export const addLike = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { postID } = req.params
-        const { userID } = req.body
-        
-        if (!postID || !userID) {
-            throw new Error("Some error occured, Please tyr after some time")
-        }
+export const addLike = catchAsync(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const post = req.params.postId;
+    const user = req.user._id;
 
-        const data = await Like.find({
-            user: userID,
-           post: postID
-        })
-        
-        if (data.length) {
-            await Like.deleteMany({
-                user: userID,
-                post: postID
-            })
-            return res.status(200).json({
-            status: "success",
-            error: false,
-        })
-        }
+    // console.log({ post, user });
 
-        await Like.create({
-            post: postID,
-            user: userID
-        })
-
-        return res.status(200).json({
-            status: "success",
-            error: false,
-        })
-
-    } catch (error) {
-        next(error)
+    if (!user) {
+      return next(
+        new AppError(
+          'You are not authorized to perform this action!, please login to try again : line 18++',
+          401
+        )
+      );
     }
-}
-
-export const getAllLikes = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { postID } = req.params
-        const { userID } = req.query
-        let currentUserLikedOrNot;
-        
-        if (!postID) throw new Error("Some error occured")
-        
-        const userLiked = await Like.find({
-            post: postID,
-            user: userID
-        })
-
-        if (userLiked.length) {
-            currentUserLikedOrNot = true
-        } else {
-            currentUserLikedOrNot = false
-        }
-        
-        const data = await Like.find({
-           post: postID
-        })
-        if(!data) return res.status(200).json({status: "success", error: false, data: 'no-content'})
-        return res.status(200).json({
-            status: "success",
-            error: false,
-            currentUserLikedOrNot,
-            data
-        })
-    } catch (error) {
-        next(error)
+    if (!post) {
+      return next(
+        new AppError(
+          'No post found with this requested id!, please try again : line 26+',
+          404
+        )
+      );
     }
-}
+
+    const data = await Like.find({
+      user,
+      post,
+    });
+
+    if (data.length) {
+      await Like.deleteMany({
+        user,
+        post,
+      });
+      return res.status(200).json({
+        status: 'success',
+        error: false,
+      });
+    }
+
+    await Like.create({
+      post,
+      user,
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      error: false,
+    });
+  }
+);
+
+export const getAllLikes = catchAsync(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const post = req.params.postId;
+    const user = req.user._id;
+
+    let currentUserLiked = false;
+
+    if (!user) {
+      return next(
+        new AppError(
+          'You are not authorized to perform this action!, please login to try again : line 70',
+          401
+        )
+      );
+    }
+    if (!post) {
+      return next(
+        new AppError(
+          'No post found with this requested id!, please try again : line 78',
+          404
+        )
+      );
+    }
+
+    const userLiked = await Like.find({
+      post,
+      user,
+    });
+
+    if (userLiked.length) currentUserLiked = true;
+
+    const data = await Like.find({ post });
+
+    return res.status(200).json({
+      status: 'success',
+      error: false,
+      currentUserLiked,
+      data: {
+        likes: data,
+      },
+    });
+  }
+);

@@ -2,8 +2,7 @@ import "../styles/globals.css";
 import { AuthContextProvider } from "../context/AuthContext";
 import { PostContextProvider } from "../context/PostContext";
 import { CookiesProvider } from "react-cookie";
-import { store } from "./../store";
-import { Provider } from "react-redux";
+import { NotificationContextProvider } from "@context/NotificationContext";
 
 const Noop: React.FC = ({ children }: any) => <>{children}</>;
 
@@ -16,11 +15,11 @@ function MyApp({ Component, pageProps }) {
     <CookiesProvider>
       <AuthContextProvider>
         <PostContextProvider>
-          <Provider store={store}>
+          <NotificationContextProvider>
             <Layout>
               <AnyComponent {...pageProps} />
             </Layout>
-          </Provider>
+          </NotificationContextProvider>
         </PostContextProvider>
       </AuthContextProvider>
     </CookiesProvider>

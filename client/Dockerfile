@@ -1,15 +1,17 @@
-FROM node:16-alpine
+FROM node:lts-alpine
 
-RUN mkdir -p /usr/src
-WORKDIR /usr/src
+WORKDIR /app
 
-COPY . /usr/src
+COPY ./package*.json ./
+COPY ./yarn.lock ./
 
 RUN yarn
+
+COPY . .
 
 # RUN yarn build
 
 EXPOSE 3000
 
-CMD yarn run dev
+CMD ["yarn", "dev"]
 

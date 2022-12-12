@@ -3,15 +3,16 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useAuthContext } from "../../../hooks/auth/useAuthContext";
 import { Add, Bell, Home, HomeFill, Profile, ProfileFill } from "../icons";
+import cn from "clsx";
+import s from "./Navbar.module.css";
 
 const Navbar = () => {
   const router = useRouter();
 
   const { user } = useAuthContext();
-  // console.log("🚀 ~ file: Navbar.tsx ~ line 13 ~ Navbar ~ _id", user._id);
 
   return (
-    <div className="bg-white bg-opacity-60 backdrop-blur-sm h-[8vh] border-slate-200 w-[92%] fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-14 rounded-lg">
+    <nav className={cn(s.nav)}>
       <Link href="/">
         <div className="cursor-pointer">
           {router.pathname === "/" ? (
@@ -21,7 +22,7 @@ const Navbar = () => {
           )}
         </div>
       </Link>
-      <Link href="/create_post">
+      <Link href="/create">
         <div className="cursor-pointer">
           <Add className="h-12 w-12" />
         </div>
@@ -38,7 +39,7 @@ const Navbar = () => {
           )}
         </div>
       </Link>
-    </div>
+    </nav>
   );
 };
 

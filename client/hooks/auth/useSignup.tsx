@@ -5,6 +5,7 @@ import { SIGNUP } from "../../constants";
 import { IRegisterResponse } from "../../types";
 
 export const useSignup = () => {
+  const SIGNUP_URL = "http://localhost:8000/api/v1/auth/signup";
   const [error, setError] = useState<null | string | undefined>(null);
   const [isLoading, setIsLoading] = useState<boolean | undefined>();
   const router = useRouter();
@@ -18,12 +19,13 @@ export const useSignup = () => {
     setIsLoading(true);
     setError(null);
 
-    const { data } = await axios.post<IRegisterResponse>(SIGNUP, {
+    const { data } = await axios.post<IRegisterResponse>(SIGNUP_URL, {
       firstname,
       lastname,
       email,
       password,
     });
+
     if (data?.error) {
       setIsLoading(false);
       setError(data?.message);

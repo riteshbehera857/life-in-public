@@ -1,111 +1,81 @@
-import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../helpers";
-import User from "../models/auth.model";
+import { AppError } from './../utils/appError';
+import { IGetUserAuthInfoRequest } from './../middlewares/auth.handler';
+import { catchAsync } from './../utils/catchAsync';
+import { Request, Response, NextFunction } from 'express';
+import User from '../models/auth.model';
 
-export const getCurrentUser = async (
-  req: Request,
+export const getMe = (
+  req: IGetUserAuthInfoRequest,
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const cookie = req.headers.cookie;
-    const token = cookie.split("=")[1];
-    let user;
-
-    if (!token) {
-      res.status(401);
-      throw new Error("You are not logged in, Please login to get access");
-    }
-
-    const decoded = verifyToken(token);
-
-    user = await User.findById(decoded.id);
-    res.status(200).json({
-      status: "success",
-      user,
-    });
-  } catch (error) {
-    next(error);
-  }
+  req.params.id = req.user._id.toString();
+  next();
 };
 
-export const updateUser = async (req: Request,
-  res: Response,
-  next: NextFunction) => {
-  try {
-    const { id } = req.params
-    const {username, avatar, fakeEmail} = req.body
+export const searchUsers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { q } = req.query;
+    const queryString = new RegExp(`${q}`);
+
+    const data = await User.find({
+      fakeEmail: { $regex: queryString, $options: 'i' },
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      error: false,
+      results: data.length,
+      data: {
+        data,
+      },
+    });
+  }
+);
+
+export const getUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
     if (!id) {
-      return res.status(404).json({
-        status: 'fail',
-        error: true
-      })
+      return res.status(400).json({
+        status: 'failed',
+        error: true,
+        message: 'Please provide an user id',
+      });
     }
-    
+    const user = await User.findById(id);
+    return res.status(200).json({
+      status: 'success',
+      error: false,
+      user,
+    });
+  }
+);
+
+export const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { username, avatar, fakeEmail } = req.body;
+
+    if (!id)
+      return next(
+        new AppError('No user found with this id, please try again later!', 404)
+      );
+
+    if (!username || !avatar || !fakeEmail)
+      return next(new AppError('Please provide all the fields', 404));
+
+    const user = await User.findById(id);
+
+    if (!user) return next(new AppError("User doesn't exist", 404));
+
     await User.findByIdAndUpdate(id, {
-      username: username ?? username,
-      avatar: avatar ?? avatar,
-      fakeEmail: fakeEmail ?? fakeEmail
-    })
+      ...req.body,
+    });
 
     res.status(200).json({
       status: 'success',
-      error: false
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
-export const updateUserPosts = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const { postID } = req.body;
-    if (!postID) throw new Error("No post created");
-    const updatedUser = await User.findByIdAndUpdate(id, {
-      $push: { posts: postID },
-    });
-    res.status(200).json({
-      status: "success",
       error: false,
-      data: {
-        updatedUser,
-      },
     });
-  } catch (error) {
-    next(error);
   }
-};
-
-export const updateUserLikedPosts = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const { postID } = req.body;
-    if (!postID)
-      throw new Error(
-        "Please check one more time if you really like that post"
-      );
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id: id },
-      { $push: { likedPosts: postID } }
-    );
-
-    res.status(200).json({
-      status: "success",
-      error: false,
-      data: {
-        updatedUser,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+);

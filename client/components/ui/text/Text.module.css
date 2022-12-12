@@ -1,0 +1,7 @@
+.root{
+    @apply text-black;
+}
+
+.sectionHeading{
+    @apply text-[1.5rem];
+}

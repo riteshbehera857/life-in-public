@@ -1,21 +1,31 @@
-import { NextFunction } from "express";
-import { Schema, model } from "mongoose";
-import { IComment } from "../../types";
+import { NextFunction } from 'express';
+import { Schema, model } from 'mongoose';
+import { IComment } from '../../types';
 
-const commentSchema = new Schema<IComment>({
-  content: {
-    type: String,
-    required: true,
+const commentSchema = new Schema<IComment>(
+  {
+    content: {
+      type: String,
+      required: [true, "The comment field can't be empty"],
+    },
+    post: {
+      type: 'ObjectID',
+      ref: 'Post',
+    },
+    user: {
+      type: 'ObjectID',
+      ref: 'User',
+    },
   },
-  post: {
-    type: "ObjectID",
-    ref: "Post",
-  },
-  created_by: {
-    type: "ObjectID",
-    ref: "User",
-  },
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  }
+);
 
-const Comment = model("Comment", commentSchema);
+commentSchema.index({ post: 1 });
+
+const Comment = model('Comment', commentSchema);
+
 export default Comment;

@@ -12,12 +12,11 @@ import { BtnLoder } from "@components/ui/loaders";
 import { Eye, EyeOff } from "@components/ui/icons";
 import { GET_USER } from "../../constants";
 import Input from "@components/forms/Input";
-
-axios.defaults.withCredentials = true;
+import { Button } from "..";
 
 const LoginPageView = () => {
+  const [error, setError] = useState(false);
   const router = useRouter();
-  const { dispatch } = useAuthContext();
   const { refreshUser } = useUser();
 
   const [loginData, setLoginData] = useState<ILogin>({
@@ -26,7 +25,13 @@ const LoginPageView = () => {
   });
   const [passwordType, setPasswordType] = useState(true);
 
-  const { login, error, isLoading, setIsLoading, setError } = useLogin();
+  const {
+    login,
+    error: loginError,
+    isLoading,
+    setIsLoading,
+    setError: setLoginError,
+  } = useLogin();
 
   const handleInput = (e: React.BaseSyntheticEvent) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -42,13 +47,16 @@ const LoginPageView = () => {
     const data = await login(loginData.email, loginData.password);
 
     if (data?.error) {
-      setError(data?.message);
+      setError(true);
+      setLoginError(data?.message);
       setIsLoading(false);
-      clear();
+      setTimeout(() => {
+        setError(false);
+      }, 4000);
       return;
     }
 
-    await refreshUser();
+    if (data?.accessToken) await refreshUser(data?.accessToken);
     setIsLoading(false);
   };
 
@@ -65,11 +73,6 @@ const LoginPageView = () => {
             you have been missed
           </p>
         </div>
-        {error && (
-          <div>
-            <p>{error}</p>
-          </div>
-        )}
         <div className="w-full">
           <form onSubmit={handleSubmit} className="w-full">
             <Input
@@ -79,16 +82,9 @@ const LoginPageView = () => {
               placeholder="Email Address"
               value={loginData.email}
               onChange={handleInput}
+              error={error}
             />
-            {/* <input
-              type="email"
-              name="email"
-              value={loginData.email}
-              onChange={handleInput}
-              className="py-padding-y-input w-full border border-accent-primary rounded-rounded-body mb-[12px] text-text-body font-bold px-padding-x-input text-[#9d9d9d] focus:outline-[#aa3eff]"
-              placeholder="Email Address"
-            /> */}
-            <div className="relative mb-[74px]">
+            <div className="relative">
               <Input
                 type={passwordType ? "password" : "text"}
                 name="password"
@@ -96,6 +92,7 @@ const LoginPageView = () => {
                 placeholder="Password"
                 value={loginData.password}
                 onChange={handleInput}
+                error={error}
               />
               <span
                 onClick={() => setPasswordType((prev) => !prev)}
@@ -103,11 +100,15 @@ const LoginPageView = () => {
               >
                 {passwordType ? <Eye /> : <EyeOff />}
               </span>
+              {error && loginError && (
+                <p className="font-bold absolute top-[calc(100% + 2rem)] text-2xl text-red-600">
+                  ⛔ {loginError}
+                </p>
+              )}
             </div>
-
-            <button className="w-full py-padding-y-btn text-center text-btn-text font-bold text-white bg-[#aa3eff] rounded-rounded-body mb-2">
+            <Button variant="contained" w="full">
               {isLoading ? <BtnLoder /> : "Sign In"}
-            </button>
+            </Button>
             <p className="font-bold text-text-body cursor-pointer text-center">
               Not a member?{" "}
               <Link href="/auth/register">

@@ -1,55 +1,88 @@
 import { useAuthContext } from "@hooks/auth/useAuthContext";
-import { useUser } from "@hooks/auth/useUser";
 import { useLike } from "@hooks/post/useLike";
-import { usePost } from "@hooks/post/usePost";
 import axios from "axios";
-import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { Post } from "../../types";
 import PostCard from "./PostCard";
 import PostInteractions from "./PostInteractions";
 import useSWR, { useSWRConfig } from "swr";
+import { useEffect, useState } from "react";
+import { useNotificationContext } from "@hooks/helpers/useNotificationContext";
 
 interface IProps {
   post: Post;
 }
 
-const PostBlock = ({ post }: IProps) => {
-  const [totalLikes, setTotalLikes] = useState<number>(0);
-  const { refreshPost } = usePost();
-  const { user } = useAuthContext();
-  const { refreshUser } = useUser();
-  const [liked, setLiked] = useState(false);
-  const { error, like, refreshLike } = useLike();
-  const dispatch = useDispatch();
-  const { mutate } = useSWRConfig();
+axios.defaults.withCredentials = true;
 
-  const fetchLikes = async () => {
-    return await axios.get(
-      `http://localhost:8000/like/${post?._id}?userID=${user?._id}`
-    );
+const PostBlock = ({ post }: IProps) => {
+  const { user, token, dispatch } = useAuthContext();
+  const { socket, notifications, dispatch: notify } = useNotificationContext();
+  const { error, like } = useLike();
+  const { mutate } = useSWRConfig();
+  const [notification, setNotfication] = useState([]);
+
+  const FETCH_LIKE = `http://localhost:8000/api/v1/post/${post?._id}/like`;
+
+  const getRefreshToken = async () => {
+    return await axios.get("http://localhost:8000/api/v1/auth/refresh", {
+      withCredentials: true,
+    });
   };
 
-  const { data, error: likeError } = useSWR(
-    `http://localhost:8000/like/${post?._id}?userID=${user?._id}`,
-    fetchLikes
-  );
+  // let count = 0;
 
-  const handleLike = async (id) => {
-    const res = await like(id, user._id);
-    if (!res?.data?.data?.error) {
-      const data = await refreshLike(id, user._id);
-      mutate(`http://localhost:8000/like/${post?._id}?userID=${user?._id}`);
+  useEffect(() => {
+    socket &&
+      socket.on("likeNotification", (data) => {
+        // console.log("Like Data...", data);
+        setNotfication((prev) => [...prev, data]);
+        // console.log("Notification...", notification);
+        // notify({ type: "NOTIFY", notification: data });
+      });
+  }, [socket]);
+
+  const tryFetchingLikes = async (url) => {
+    return await axios.get(url);
+  };
+
+  const fetchLikes = async (url) => {
+    try {
+      const likes = await tryFetchingLikes(url);
+      return likes.data;
+    } catch (error) {
+      if (error.response.status === 401) {
+        const {
+          data: { accessToken },
+        } = await getRefreshToken();
+        const likes = await tryFetchingLikes(url);
+        dispatch({ type: "LOGIN", token: accessToken });
+        return likes.data;
+      }
     }
   };
+
+  const { data: likeData, error: likeError } = useSWR(FETCH_LIKE, fetchLikes, {
+    revalidateOnFocus: false,
+    refreshInterval: 3600000,
+  });
+
+  const handleLike = async () => {
+    axios
+      .post(FETCH_LIKE)
+      .then((res) => {
+        mutate(FETCH_LIKE);
+      })
+      .catch((err) => console.log(err, "Error..."));
+  };
+
   return (
     <>
       <PostCard
         post={post}
         handleLike={handleLike}
-        liked={data?.data?.currentUserLikedOrNot}
+        totalLikes={likeData?.data?.likes.length}
+        liked={likeData?.currentUserLiked}
       />
-      <PostInteractions post={post} totalLikes={data?.data?.data?.length} />
     </>
   );
 };

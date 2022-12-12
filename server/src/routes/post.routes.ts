@@ -1,17 +1,22 @@
-import express from "express";
-import protectRoute from "../middlewares/auth.handler";
+import express from 'express';
+import protectRoute from '../middlewares/auth.handler';
 import {
   createPost,
   deletePost,
   getPost,
   getPosts,
-  updatePostLikes,
-} from "../controller/post.controller";
+} from '../controller/post.controller';
+import likeRouter from '../routes/like.routes';
+import commentRouter from '../routes/comment.routes';
+import fileUploadRouter from '../routes/fileUpload.routes';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
-router.route("/").get(getPosts);
-router.route("/:id").get(getPost).delete(deletePost);
-router.route("/create_post").post(createPost);
-router.route("/update-post-likes/:id").patch(updatePostLikes);
+router.use('/:postId/like', likeRouter);
+router.use('/:postId/comment', commentRouter);
+router.use('/upload', fileUploadRouter);
+
+router.route('/').get(protectRoute, getPosts).post(protectRoute, createPost);
+router.route('/:id').get(getPost).delete(deletePost);
+
 export default router;

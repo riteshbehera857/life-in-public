@@ -1,26 +1,17 @@
-## CLIENT
-
-```env
-NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:
-NEXT_PUBLIC_BACKEND_PORT=8000
-
-NEXT_PUBLIC_BACKEND_SIGNUP_END_POINT=/auth/signup
-NEXT_PUBLIC_BACKEND_LOGIN_END_POINT=/auth/login
-
-NEXT_PUBLIC_CURRENT_USER_END_POINT = /user
-```
-
 ## SERVER
 
 ```
 BASE_URL = http://localhost:
 PORT = 8000
+NODE_ENV = development
 
 # Mongo_credentials
 MONGO_DATABASE_URL = mongodb+srv://riteshk_behera:<PASSWORD>@cluster0.8f9b4.mongodb.net/LifeInPublic_DB?retryWrites=true&w=majority
 MONGO_DATABASE_URL_PASSWORD_DEV = ufgwN8SJRf5Cg6k4
 
 # JWT_credentials
-JWT_SECRET_DEV =  hello-this-is-ritesh-building-a-app-for-public-to-share-their-thoughts-without-revealing-their-idenitity
-JWT_EXPIRES_IN_DEV = 180d
+ACCESS_TOKEN_SECRET =  1647d02b9301e2c77f5a5738c76c70a4b98f883a320e720b2d3da130c7d515052eb38d98727ec959fb6036133f1892bd4a11e427f05df6ebbef2081f4e253303
+REFRESH_TOKEN_SECRET = 015237cb5ef6acadf6c41eab4cdab3abb65569cb637b1b1ce7bf4327475393204113b80b36c9b0484250a5482e873108eb7c0fa3c4d8823c21b396ffbc59ec3d
+JWT_EXPIRES_IN_DEV = 1d
+JWT_REFRESH_EXPIRES_IN = 15d
 ```

@@ -3,21 +3,21 @@ import FileInput from "@components/forms/FileInput";
 import Input from "@components/forms/Input";
 
 const MediaUploadForm = ({
-  handleRef,
   previewSource,
   deletePreview,
-  myRef,
   handleFileChange,
   caption,
+  onDrop,
+  fileUploading,
   handleInputChange,
 }) => {
   return (
     <>
       <FileInput
-        handleRef={handleRef}
+        onDrop={onDrop}
         previewSource={previewSource}
         deletePreview={deletePreview}
-        myRef={myRef}
+        fileUploading={fileUploading}
         onChange={handleFileChange}
         label="Select Photo"
       />

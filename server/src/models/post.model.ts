@@ -1,42 +1,39 @@
-import { NextFunction } from "express";
-import { Schema, model, ObjectId } from "mongoose";
-import { IPost } from "../../types";
+import { NextFunction } from 'express';
+import { Schema, model } from 'mongoose';
+import { IPost } from '../../types';
 
-const postSchema = new Schema<IPost>({
-  cover: {
-    type: String,
-  },
-  caption: {
-    type: String,
-  },
-  body: {
-    type: String,
-  },
-  likes: [
-    {
-      type: "ObjectId",
-      ref: "User",
+const postSchema = new Schema<IPost>(
+  {
+    cover: String,
+    caption: {
+      type: String,
+      maxlength: [300, "This number of characters can't be more than 300"],
     },
-  ],
-  comments: [
-    {
-      type: "ObjectId",
-      ref: "Comment",
+    body: {
+      type: String,
+      maxlength: [300, "This number of characters can't be more than 300"],
     },
-  ],
-  created_by: {
-    type: "ObjectId",
-    ref: "User",
-    required: true,
+    createdBy: {
+      type: 'ObjectId',
+      ref: 'User',
+    },
   },
-}, {
-  timestamps: true
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  }
+);
 
-postSchema.pre("/^find/", function (next: NextFunction) {
-  this.populate("likes");
+postSchema.index({ createdBy: 1 });
+
+postSchema.pre('find', function (next: NextFunction) {
+  this.populate({
+    path: 'createdBy',
+    select: { username: 1, fakeEmail: 1, avatar: 1 },
+  });
   next();
 });
 
-const Post = model("Post", postSchema);
+const Post = model('Post', postSchema);
 export default Post;

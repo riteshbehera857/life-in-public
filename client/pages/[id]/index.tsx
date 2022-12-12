@@ -2,21 +2,38 @@ import Image from "next/future/image";
 import React, { ReactElement } from "react";
 import { Layout } from "../../components";
 import { useAuthContext } from "../../hooks/auth/useAuthContext";
+import useSWR from "swr";
+import { GET_POST } from "@constants/index";
+import axios from "axios";
+import type { Post } from "../../types";
+import dayjs from "dayjs";
+import UserDetails from "@components/profile/UserDetails";
+import PageHeader from "@components/postForm/PageHeader";
+import { ArrowLeft } from "@components/ui/icons";
+
+const fetchUserPosts = async (url) => {
+  const res = await axios.get(url);
+  return res.data;
+};
 
 const Profile = () => {
-  const { user } = useAuthContext();
+  const { user, token } = useAuthContext();
+  const GET_CURRENT_USER_POSTS = `http://localhost:8000/api/v1/user/${user?.id}/post`;
+
+  const { data: postData, error: postError } = useSWR(
+    [GET_CURRENT_USER_POSTS, token],
+    fetchUserPosts
+  );
 
   return (
-    <div className="px-6">
-      <div className="flex items-center gap-6 mt-5">
-        <div className="h-[5rem] w-[5rem] rounded-full bg-slate-100 ring-2 ring-accent-primary">
-          <Image src={user?.avatar} height={200} width={200} alt={user?._id} />
-        </div>
-        <div>
-          <h1 className="text-[1.5rem] font-bold">{user?.fakeEmail}</h1>
-        </div>
-      </div>
-    </div>
+    <>
+      <PageHeader
+        title={user?.username}
+        href="/"
+        icon={<ArrowLeft className="h-10 w-10 cursor-pointer" />}
+      />
+      <UserDetails posts={postData?.data?.posts} user={user} />
+    </>
   );
 };
 

@@ -1,23 +1,51 @@
-import React from "react";
+import React, { InputHTMLAttributes } from "react";
 
-const Input = ({ type, value, label, name, onChange, placeholder }) => {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  type: string;
+  value: string | number;
+  label?: string;
+  name?: string;
+  onChange: (e: React.ChangeEvent) => void;
+  placeholder: string;
+  error?: boolean;
+}
+
+const Input: React.FC<InputProps> = ({
+  type,
+  value,
+  label,
+  name,
+  onChange,
+  placeholder,
+  error,
+}) => {
   return (
-    <div className="relative">
-      <label
-        htmlFor={name}
-        className={`absolute ${
-          value ? "top-[22%] text-[14px] opacity-100" : "top-[48.5%] opacity-0"
-        } left-[22px] text-text-body font-bold text-[#9d9d9d] transition-all duration-300`}
-      >
-        {label}
-      </label>
+    <div className={`relative`}>
+      {label && (
+        <label
+          htmlFor={name}
+          className={`absolute ${
+            value
+              ? "top-[22%] text-[14px] opacity-100"
+              : "top-[48.5%] opacity-0"
+          } ${
+            error ? "text-red-600" : "text-[#9d9d9d]"
+          } left-[22px] text-text-body font-bold transition-all duration-300`}
+        >
+          {label}
+        </label>
+      )}
       <input
-        id={name}
+        id={name && name}
         type={type}
-        name={name}
+        name={name && name}
         value={value}
         onChange={onChange}
-        className={`py-padding-y-input w-full border-2  mt-2 border-accent-primary rounded-rounded-body mb-[12px] text-text-body font-bold px-padding-x-input text-[#000] placeholder:text-[#9d9d9d] focus:outline-[#aa3eff]`}
+        className={`py-padding-y-input w-full border-2  mt-2 ${
+          error
+            ? "border-red-700 text-red-600"
+            : "border-accent-primary text-[#000]"
+        }  rounded-rounded-body mb-[12px] text-text-body font-bold px-padding-x-input placeholder:text-[#9d9d9d] focus:outline-accent-primary`}
         placeholder={placeholder}
       />
     </div>

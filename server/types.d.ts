@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export interface IUser {
   _id: Types.ObjectId;
@@ -10,24 +10,30 @@ export interface IUser {
   password: string;
   cover: string;
   fakeEmail: string;
-  posts: [Types.ObjectId];
-  likedPosts: any[];
 }
 
 export interface IPost {
   cover?: string;
   caption?: string;
   body?: string;
-  likes?: [Types.ObjectId];
-  created_by?: {
+  createdBy?: {
     type: Types.ObjectId;
   };
-  comments?: [Types.ObjectId];
   timestamp: boolean;
 }
 
 export interface IComment {
   content?: string;
   post: Types.ObjectId;
-  created_by?: Types.ObjectId;
+  user?: Types.ObjectId;
+}
+
+export interface IFollow {
+  follower: Types.ObjectId;
+  following: Types.ObjectId;
+}
+
+interface ErrorArgs {
+  status?: string;
+  statusCode?: number;
 }

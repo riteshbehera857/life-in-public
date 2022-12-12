@@ -7,7 +7,7 @@ export interface ILoginResponse {
   status: "success" | "failed";
   error: boolean;
   message?: string;
-  token?: string;
+  accessToken?: string;
 }
 
 export interface IRegisterResponse {

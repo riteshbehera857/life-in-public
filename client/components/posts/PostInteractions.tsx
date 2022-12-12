@@ -9,7 +9,7 @@ interface IProps {
   totalLikes: number;
 }
 
-const PostInteractions = ({ post, totalLikes }: IProps) => {
+const PostInteractions = React.memo(({ post, totalLikes }: IProps) => {
   return (
     <>
       <div className="">
@@ -35,6 +35,8 @@ const PostInteractions = ({ post, totalLikes }: IProps) => {
       </div>
     </>
   );
-};
+});
+
+PostInteractions.displayName = "PostInteractions";
 
 export default PostInteractions;

@@ -1,88 +1,103 @@
-import { Request, Response, NextFunction } from "express";
-import { HydratedDocument } from "mongoose";
-import { IUser } from "../../types";
-import { assignToken, compareHash } from "../helpers";
-import User from "../models/auth.model";
+import { promisify } from 'util';
+import { catchAsync } from './../utils/catchAsync';
+import { AppError } from './../utils/appError';
+import { bodyIsEmpty } from './../helpers/checkBody';
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { assignToken, compareHash } from '../helpers';
+import User from '../models/auth.model';
 
-const signup = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { firstname, lastname, email, password, cover } = req.body;
-    if (!req.body) {
-      res.json({
-        status: "failed",
-        error: true,
-        message: "Please fill all the required fields",
-      });
+const signup = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (bodyIsEmpty(req.body)) {
+      return next(new AppError('Please provide all the required fields', 406));
     }
 
-    const user = await User.findOne({ email });
-    if (user) {
-      res.json({
-        status: "failed",
-        error: true,
-        message: "A user with this email already exists",
-      });
-    }
+    const user = await User.findOne({ email: req.body.email });
 
-    const newUser: HydratedDocument<IUser> = await User.create({
-      firstname,
-      lastname,
-      email,
-      password,
-      cover,
+    if (user)
+      return next(new AppError('An user with this email already exists', 400));
+
+    await User.create({
+      ...req.body,
     });
 
-    // Assign a new token to the newly created user
-    const token = assignToken(newUser._id);
     res.status(201).json({
-      status: "success",
+      status: 'success',
       error: false,
-      data: { user: newUser },
     });
-  } catch (error: any) {
-    next(error);
   }
-};
+);
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+const login = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      res.json({
-        status: "failed",
-        error: true,
-        message: "Please fill all the required fields",
-      });
+    if (bodyIsEmpty(req.body)) {
+      return next(new AppError('Please fill all the required fields!', 406));
     }
 
     const user = await User.findOne({ email }).select('password');
 
-    if (!user || !(await compareHash(password, user.password))) {
-      res.json({
-        status: "failed",
-        error: true,
-        message: "Invalid email or password",
-      });
-    }
+    if (!user || !(await compareHash(password, user.password)))
+      return next(new AppError('Invalid email or password, try again', 401));
 
-    const token = assignToken(user._id);
+    const accessToken = assignToken(user._id, 'ACCESS');
+    const refreshToken = assignToken(user._id, 'REFRESH');
 
-    res.cookie("JWT", token, {
-      path: "/",
-      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 1000),
+    res.cookie('JWT', refreshToken, {
+      path: '/',
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000 * 15),
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: 'lax',
     });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       error: false,
-      token,
+      accessToken,
     });
-  } catch (error) {
-    next(error);
   }
-};
+);
 
-export { signup, login };
+const refresh = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { JWT } = req.cookies;
+
+    if (!JWT) return next(new AppError('Unauthorized', 401));
+
+    const refreshToken = JWT;
+
+    const decoded = await promisify(jwt.verify)(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    const user = await User.findById(decoded.id);
+    const accessToken = assignToken(user._id, 'ACCESS');
+
+    res.status(200).json({
+      status: 'success',
+      error: false,
+      accessToken,
+    });
+  }
+);
+
+const logout = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { JWT } = req.cookies;
+
+    if (!JWT) return next(new AppError('Unauthorized', 401));
+
+    res.clearCookie('JWT', { sameSite: 'lax', httpOnly: true, secure: true });
+
+    return res.status(200).json({
+      status: 'success',
+      error: false,
+      message: 'User logged out successfully',
+    });
+  }
+);
+
+export { signup, login, refresh, logout };

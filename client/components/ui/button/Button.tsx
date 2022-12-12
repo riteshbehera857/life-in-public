@@ -5,10 +5,9 @@ import s from "./Button.module.css";
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   href?: string;
   className?: string;
-  variant?: "flat" | "slim" | "ghost" | "naked";
+  variant?: "contained" | "outlined";
   active?: boolean;
-  type?: "submit" | "reset" | "button";
-  width?: string | number;
+  w?: string | number;
   loading?: boolean;
   disabled?: boolean;
 }
@@ -16,10 +15,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const Button: React.FC<ButtonProps> = (props) => {
   const {
     className,
-    variant = "flat",
+    variant = "contained",
     children,
     active,
-    width,
+    w,
     loading = false,
     disabled = false,
     style = {},
@@ -27,8 +26,12 @@ const Button: React.FC<ButtonProps> = (props) => {
   } = props;
   const rootClassName = cn(
     s.root,
+    w === "full" ? "w-full" : `w-${w}`,
     {
-      [s.something]: variant === "flat",
+      [s.contained]: variant === "contained",
+    },
+    {
+      [s.outlined]: variant === "outlined",
     },
     className
   );
@@ -40,7 +43,6 @@ const Button: React.FC<ButtonProps> = (props) => {
       className={rootClassName}
       disabled={disabled}
       style={{
-        width,
         ...style,
       }}
       {...rest}
@@ -50,4 +52,4 @@ const Button: React.FC<ButtonProps> = (props) => {
   );
 };
 
-export default Button;
+export default React.memo(Button);

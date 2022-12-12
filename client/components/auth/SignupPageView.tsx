@@ -40,6 +40,7 @@ const SignupPageView = () => {
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
+
     await signup(
       signupData.firstname,
       signupData.lastname,
