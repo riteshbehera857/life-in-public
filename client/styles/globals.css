@@ -259,6 +259,19 @@ fill: red;
 animation: heartPop .5s ease-in-out;
 }
 
+.liked::before{
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  filter: blur(3rem);
+  background-color: red;
+}
+
 
 @keyframes heartPop{
   0%{

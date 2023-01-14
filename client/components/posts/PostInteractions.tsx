@@ -1,3 +1,4 @@
+import Text from "@components/ui/text/Text";
 import axios from "axios";
 import moment from "moment";
 import Link from "next/link";
@@ -12,9 +13,6 @@ interface IProps {
 const PostInteractions = React.memo(({ post, totalLikes }: IProps) => {
   return (
     <>
-      <div className="">
-        <p className="font-bold text-[1.5rem]">{totalLikes} likes</p>
-      </div>
       <div className="mb-[1rem]">
         <p className="font-bold text-[1.5rem]">
           {post?.created_by?.username}{" "}

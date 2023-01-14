@@ -45,6 +45,7 @@ const Text: FunctionComponent<TextProps> = ({
         s.root,
         {
           [s.sectionHeading]: variant === "sectionHeading",
+          [s.paragraph]: variant === "paragraph",
         },
         className
       )}

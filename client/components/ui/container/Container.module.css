@@ -1,0 +1,15 @@
+.root {
+  @apply bg-white bg-opacity-40 backdrop-blur-sm;
+}
+
+.nav {
+  @apply h-[8vh] border-slate-200 w-[100%] fixed bottom-0 left-0 z-[120] flex items-center justify-center gap-14 rounded-lg;
+}
+
+.header {
+  @apply w-full h-[8vh] px-5 flex items-center justify-center border-b border-slate-200 sticky z-[999] top-0 left-0;
+}
+
+.div {
+  @apply flex items-center justify-center border border-gray-100 cursor-pointer  p-4;
+}

@@ -4,19 +4,24 @@ import Image from "next/future/image";
 import { useRouter } from "next/router";
 import React from "react";
 import PostActions from "./PostActions";
+import cn from "clsx";
+import s from "./Post.module.css";
+import { BlurView } from "@components/ui/container";
+import UserInfoSwatch from "@components/profile/UserInfoSwatch";
 
 const PostBody = ({ post, handleLike, liked, totalLikes }) => {
   const router = useRouter();
   return (
     <>
-      <div className="flex items-center mb-[1rem] relative">
-        <div
+      <div className={cn(s.root)}>
+        <UserInfoSwatch post={post} />
+        {/* <BlurView
+          type="div"
           onClick={() => router.push(`/user/${post?.createdBy?.id}`)}
-          className={`flex items-center mb-2 cursor-pointer rounded-full p-4 ${
-            post?.cover
-              ? "absolute top-8 z-50 left-4 bg-[#ffffff] bg-opacity-30"
-              : "bg-white"
-          }`}
+          className={cn({
+            [s.post_with_cover_userinfo]: post?.cover,
+            [s.post_without_cover_userinfo]: !post?.cover,
+          })}
         >
           <div className="mr-4">
             <Image
@@ -32,21 +37,21 @@ const PostBody = ({ post, handleLike, liked, totalLikes }) => {
               {moment(post?.createdAt).format("DD MMM, YYYY")}
             </p>
           </div>
-        </div>
+        </BlurView> */}
       </div>
       {post?.body && (
-        <div className="p-[2rem] mb-[1.5rem] border border-[#E2E8F0] rounded-[10px]">
-          <p className="text-[1.5rem]">{post?.body}</p>
+        <div className={cn(s.post_body)}>
+          <Text variant="paragraph">{post?.body}</Text>
         </div>
       )}
       {post?.cover && (
-        <div className="mb-[1.5rem] rounded-[10px] relative overflow-hidden">
+        <div className="w-full rounded-[10px] overflow-hidden relative">
           <Image
             src={post?.cover}
-            width="360"
-            height={260}
             alt={post?.cover}
             loading="lazy"
+            height={1000}
+            width={1000}
           />
           <PostActions
             post={post}
@@ -57,7 +62,9 @@ const PostBody = ({ post, handleLike, liked, totalLikes }) => {
         </div>
       )}
       {post?.caption ? (
-        <p className="mt-4 text-2xl font-bold">{post?.caption}</p>
+        <Text variant="paragraph" className="mt-4 font-bold">
+          {post?.caption}
+        </Text>
       ) : (
         ""
       )}

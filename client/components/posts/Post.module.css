@@ -1,0 +1,23 @@
+.root {
+  @apply flex items-center relative;
+}
+
+.post_body {
+  @apply p-[2rem] my-[1.5rem] border border-[#E2E8F0] rounded-[10px];
+}
+
+.post_actions {
+  @apply flex items-center gap-[1rem] mb-[1rem];
+}
+
+.post_with_cover_actions {
+  @apply absolute bottom-0 left-4;
+}
+
+.post_likes {
+  @apply flex items-center border border-gray-100 relative bg-white justify-center gap-2 cursor-pointer min-w-[8rem] rounded-full p-4;
+}
+
+.post_comment {
+  @apply flex items-center bg-white gap-2 rounded-full p-4;
+}

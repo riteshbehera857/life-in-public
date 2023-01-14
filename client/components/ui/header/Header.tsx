@@ -13,6 +13,7 @@ import s from "./Header.module.css";
 // import Dropdown from "../dropdown/Dropdown";
 import dynamic from "next/dynamic";
 import FullPageLoader from "../loaders/FullPageLoader";
+import { BlurView } from "../container";
 
 axios.defaults.withCredentials = true;
 
@@ -44,7 +45,7 @@ const Header = () => {
   };
   return (
     <>
-      <header className={cn(s.header)}>
+      <BlurView type="header">
         {router.pathname === `/[id]` ? (
           <h1 className="text-[2.4rem] font-bold">{user?.username}</h1>
         ) : (
@@ -65,7 +66,7 @@ const Header = () => {
         {/* <span onClick={handleLogout} className="cursor-pointer">
         <Logout />
       </span> */}
-      </header>
+      </BlurView>
       {dropdownActive ? (
         <Dropdown
           dropdownActive={dropdownActive}

@@ -7,6 +7,7 @@ import PostInteractions from "./PostInteractions";
 import useSWR, { useSWRConfig } from "swr";
 import { useEffect, useState } from "react";
 import { useNotificationContext } from "@hooks/helpers/useNotificationContext";
+import { useRefreshToken } from "@lib/get-refresh-token";
 
 interface IProps {
   post: Post;
@@ -20,14 +21,9 @@ const PostBlock = ({ post }: IProps) => {
   const { error, like } = useLike();
   const { mutate } = useSWRConfig();
   const [notification, setNotfication] = useState([]);
+  const { refresh } = useRefreshToken();
 
   const FETCH_LIKE = `http://localhost:8000/api/v1/post/${post?._id}/like`;
-
-  const getRefreshToken = async () => {
-    return await axios.get("http://localhost:8000/api/v1/auth/refresh", {
-      withCredentials: true,
-    });
-  };
 
   // let count = 0;
 
@@ -53,7 +49,7 @@ const PostBlock = ({ post }: IProps) => {
       if (error.response.status === 401) {
         const {
           data: { accessToken },
-        } = await getRefreshToken();
+        } = await refresh();
         const likes = await tryFetchingLikes(url);
         dispatch({ type: "LOGIN", token: accessToken });
         return likes.data;

@@ -5,6 +5,7 @@ import { useAuthContext } from "../../../hooks/auth/useAuthContext";
 import { Add, Bell, Home, HomeFill, Profile, ProfileFill } from "../icons";
 import cn from "clsx";
 import s from "./Navbar.module.css";
+import BlurView from "../container/BlurView";
 
 const Navbar = () => {
   const router = useRouter();
@@ -12,7 +13,7 @@ const Navbar = () => {
   const { user } = useAuthContext();
 
   return (
-    <nav className={cn(s.nav)}>
+    <BlurView type="nav">
       <Link href="/">
         <div className="cursor-pointer">
           {router.pathname === "/" ? (
@@ -39,7 +40,7 @@ const Navbar = () => {
           )}
         </div>
       </Link>
-    </nav>
+    </BlurView>
   );
 };
 

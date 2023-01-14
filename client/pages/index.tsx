@@ -44,7 +44,9 @@ const Home = () => {
         posts?.map((post) => (
           <div
             key={post?._id}
-            className={`mb-10 last:mb-32 relative p-2 px-4 rounded-rounded-body bg-[#f2f2f2]`}
+            className={`mb-10 last:mb-32 relative ${
+              post?.cover ? null : "p-2 px-4 bg-[#f2f2f2]"
+            } rounded-rounded-body`}
           >
             <PostBlock post={post} />
           </div>

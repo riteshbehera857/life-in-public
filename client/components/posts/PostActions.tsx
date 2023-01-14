@@ -2,6 +2,9 @@ import React from "react";
 import { Comment, Like, LikeFill } from "@components/ui/icons";
 import { Post } from "../../types";
 import { useRouter } from "next/router";
+import cn, { clsx } from "clsx";
+import s from "./Post.module.css";
+import { BlurView } from "@components/ui/container";
 interface IProps {
   post: Post;
   handleLike: () => void;
@@ -13,39 +16,61 @@ const PostActions = ({ post, handleLike, liked, totalLikes }: IProps) => {
   const router = useRouter();
   return (
     <div
-      className={`flex items-center gap-[1rem] mb-[1rem] ${
-        post?.cover ? "absolute bottom-0 left-4" : ""
-      }`}
+      className={cn(s.post_actions, {
+        [s.post_with_cover_actions]: post?.cover,
+      })}
     >
-      <div
-        onClick={() => handleLike()}
-        className={`flex items-center justify-center gap-2 bg-white cursor-pointer min-w-[8rem] rounded-full p-4 ${
-          post?.cover ? "bg-opacity-30" : ""
-        }`}
-      >
-        <>
-          {liked ? (
-            <LikeFill className="h-10 w-10" />
-          ) : (
-            <Like className="h-10 w-10" />
-          )}
-          <p className="text-2xl text-black font-bold">
-            {totalLikes ? totalLikes : 0}
-          </p>
-        </>
-      </div>
-      <div
-        className={`flex items-center bg-white gap-2 rounded-full p-4 ${
-          post?.cover ? "bg-opacity-30" : ""
-        }`}
-      >
-        <Comment
-          onClick={() => router.push(`/post/comments/${post?._id}`)}
-          className="cursor-pointer h-10 w-10"
-        />
-      </div>
+      {post?.cover ? (
+        <BlurView
+          type="div"
+          onClick={() => handleLike()}
+          className="gap-2 cursor-pointer min-w-[8rem] rounded-full"
+        >
+          <LikeContainer liked={liked} totalLikes={totalLikes} />
+        </BlurView>
+      ) : (
+        <div onClick={() => handleLike()} className={clsx(s.post_likes)}>
+          <LikeContainer liked={liked} totalLikes={totalLikes} />
+        </div>
+      )}
+      {post?.cover ? (
+        <BlurView
+          type="div"
+          onClick={() => handleLike()}
+          className="cursor-pointer rounded-full"
+        >
+          <CommentContainer
+            post={post}
+            onClick={() => router.push(`/post/comments/${post?._id}`)}
+          />
+        </BlurView>
+      ) : (
+        <div className={cn(s.post_comment)}>
+          <CommentContainer
+            post={post}
+            onClick={() => router.push(`/post/comments/${post?._id}`)}
+          />
+        </div>
+      )}
     </div>
   );
 };
+
+const LikeContainer = ({ liked, totalLikes }) => (
+  <>
+    {liked ? (
+      <LikeFill className="h-10 w-10" />
+    ) : (
+      <Like className="h-10 w-10" />
+    )}
+    <p className="text-2xl text-black font-bold">
+      {totalLikes ? totalLikes : 0}
+    </p>
+  </>
+);
+
+const CommentContainer = ({ post, onClick }) => (
+  <Comment onClick={onClick} className="cursor-pointer h-10 w-10" />
+);
 
 export default PostActions;

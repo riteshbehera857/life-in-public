@@ -5,3 +5,7 @@
 .sectionHeading{
     @apply text-[1.5rem];
 }
+
+.paragraph{
+    @apply text-[1.5rem];
+}

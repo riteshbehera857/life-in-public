@@ -1,0 +1,11 @@
+.post_userinfo {
+  @apply flex items-center mb-2 cursor-pointer rounded-full p-4;
+}
+
+.post_with_cover_userinfo {
+  @apply absolute top-2 z-50 left-4 border border-gray-50;
+}
+
+.post_without_cover_userinfo {
+  @apply bg-white;
+}
