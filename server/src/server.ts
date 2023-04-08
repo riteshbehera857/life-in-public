@@ -11,11 +11,12 @@ const DB = process.env.MONGO_DATABASE_URL.replace(
 
 mongoose
   .connect(DB)
-  .then((conn) =>
-    console.log(`Database successfully running on ${conn.connection.host}`)
-  )
+  .then((conn) => {
+    server.listen(port, () => {
+      console.log(`Database successfully running on ${conn.connection.host}`);
+      console.log(
+        `⚡️[server]: Server is running at https://localhost:${port}`
+      );
+    });
+  })
   .catch((err) => console.log(`${err}`));
-
-server.listen(port, () =>
-  console.log(`⚡️[server]: Server is running at https://localhost:${port}`)
-);

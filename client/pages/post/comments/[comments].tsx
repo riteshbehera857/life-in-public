@@ -1,32 +1,33 @@
+import { ArrowLeft, Send } from "@components/ui/icons";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Image from "next/future/image";
-import { useRouter } from "next/router";
 import useSwr, { useSWRConfig } from "swr";
 
-import { ArrowLeft, Send } from "@components/ui/icons";
-import { useAuthContext } from "@hooks/auth/useAuthContext";
-import { COMMENT, CREATE_COMMENT } from "@constants/index";
+import Image from "next/image";
+// import { COMMENT, CREATE_COMMENT } from "@constants/index";
 import NoContent from "@components/posts/NoContent";
+import axios from "axios";
 import no_comment from "@assets/no_comment.svg";
+import { useAuthContext } from "@hooks/auth/useAuthContext";
+import { useRouter } from "next/router";
 
 const Comments = () => {
   const router = useRouter();
   const param = router?.query?.comments;
   const { mutate } = useSWRConfig();
 
+  const COMMENT = `http://localhost:8000/api/v1/post/${param}/comment`;
   const [comment, setComment] = useState<string>("");
 
   const { user } = useAuthContext();
 
   const fetchComments = async () => {
-    const res = await axios.get(`${COMMENT}/${param}`);
+    const res = await axios.get(`${COMMENT}`);
     return res;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post(CREATE_COMMENT, {
+    await axios.post(COMMENT, {
       content: comment,
       created_by: user._id,
       post: param,
@@ -35,7 +36,7 @@ const Comments = () => {
     setComment("");
     mutate(`${COMMENT}/${param}`);
   };
-  const { data, error } = useSwr(`${COMMENT}/${param}`, fetchComments);
+  const { data, error } = useSwr(`${COMMENT}`, fetchComments);
   return (
     <div className="px-6">
       <div className="h-[8vh] flex gap-8 items-center">
